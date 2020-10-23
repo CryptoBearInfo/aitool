@@ -1,4 +1,6 @@
-![](https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png)
+<div align=center>
+![logo](https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png)
+</div>
 
 aitool 0.0.1 - [官方主页](https://www.walle-web.io)
 
