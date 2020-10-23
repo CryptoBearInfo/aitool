@@ -1,6 +1,7 @@
 <div align=center>
-![logo](https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png)
+<img src="https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png">
 </div>
+![logo](https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png)
 
 aitool 0.0.1 - [官方主页](https://www.walle-web.io)
 
