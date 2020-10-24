@@ -2,8 +2,8 @@
 
 --------------------------------------------------------------------------------
 
-[![release](https://badgen.net/badge/release/0.0.1/blue)] 
-![stars](https://badgen.net/github/stars/micromatch/micromatch)
+![version](https://badgen.net/badge/version/0.0.1/blue)
+![stars](https://img.shields.io/github/stars/deepgameai/aitool?style=social)
 
 AITool is a Python package that provides two high-level features:
 - 封装了有百种算法（包括动态规划、统计模型、深度学习等等）
