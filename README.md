@@ -1,4 +1,4 @@
-![AITool logo](https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png)
+[![AITool logo](https://raw.githubusercontent.com/deepgameai/aitool/main/doc/logo/logo.png)](https://aitool20201028.readthedocs.io/en/latest/)
 
 --------------------------------------------------------------------------------
 
