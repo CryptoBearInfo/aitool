@@ -9,9 +9,9 @@ class Node:
     The *Node* in the graph must have a *name* and can have an additional *info* of any structure.
     The *name* and *info* must support the **=** operation.
     *name* is not the identifier of *Node*.
-    图谱中的节点*Node*必须有一个*name*，并可以带有一个额外的任意结构的*info*。
-    *name*和*info*必须支持**=**操作。
-    *name*并不是*Node*的标识符。
+    图谱中的节点Node必须有一个nam，并可以带有一个额外的任意结构的info。
+    name和info必须支持=操作。
+    name并不是Node的标识符。
     """
     def __init__(self, name: Any, info: Any = None) -> None:
         self.name = name
