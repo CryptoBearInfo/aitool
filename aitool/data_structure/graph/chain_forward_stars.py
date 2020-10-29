@@ -113,8 +113,6 @@ class ChainForwardStars:
         self.edge_count += 1
 
     def built(self, data: list) -> None:
-        # for e1, r, e2 in data:
-        #     self.add_triple(e1, e2, r)
         for piece in data:
             self.add_triple(
                 piece.node_begin,

@@ -131,3 +131,4 @@ dmypy.json
 # customize
 .idea
 .DS_Store
+application
