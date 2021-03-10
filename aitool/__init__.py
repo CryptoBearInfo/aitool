@@ -2,4 +2,6 @@
 # @Time    : 2020/10/22
 # @Author  : xiangyuejia@qq.com
 
-name = "aitool"
+import aitool.basic_function as base
+
+import aitool.data_structure.graph as graph
