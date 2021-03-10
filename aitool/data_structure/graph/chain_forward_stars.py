@@ -1,29 +1,53 @@
 # -*- coding: UTF-8 -*-
 # @Time    : 2020/10/26
 # @Author  : xiangyuejia@qq.com
-from typing import Any, List
+from typing import Any, List, Callable
 
 
 class Node:
-    """
-    The *Node* in the graph must have a *name* and can have an additional *info* of any structure.
-    The *name* and *info* must support the **=** operation.
-    *name* is not the identifier of *Node*.
-    图谱中的节点Node必须有一个nam，并可以带有一个额外的任意结构的info。
-    name和info必须支持=操作。
-    name并不是Node的标识符。
-    """
     def __init__(self, name: Any, info: Any = None) -> None:
+        """
+        The *Node* in the graph must have a *name* and can have an additional *info* of any structure.
+        The *name* and *info* must support the **=** operation.
+        *name* is not the primary of *Node*.
+        图谱中的节点Node必须有一个name，并可以带有一个额外的任意结构的info。
+        name和info必须支持=操作。
+        name并不是Node的标识符。
+        :param name: the name of node
+        :param info: the additional information
+        """
         self.name = name
         self.info = info
 
 
 class Edge:
-    def __init__(self, end: int, pre: int, name: Any = None,info: Any = None) -> None:
+    """
+    Defines the structure of Edge.
+    定义了Edge的结构。
+    """
+    def __init__(self, end: int, pre: int, name: Any = None, info: Any = None) -> None:
+        """
+        The *Edge* in the graph must have an *end*, a *pre*, a *name* and can have an additional *info* of any structure.
+        The *name* and *info* must support the **=** operation.
+        *name* is not the primary key of *Edge*.
+        图谱中的边Edge必须有一个end，一个pre，一个name，并可以带有一个额外的任意结构的info。
+        name和info必须支持=操作。
+        name并不是Edge的主键。
+        :param end: the index of end note in
+        :param pre:
+        :param name:
+        :param info:
+        """
         self.end = end
         self.pre = pre
         self.name = name
         self.info = info
+
+
+def is_edge_selected(edge: Edge, select_names: List[Any]):
+    if edge.name in select_names:
+        return True
+    return False
 
 
 class Piece:
@@ -136,6 +160,99 @@ class ChainForwardStars:
     def clear(self):
         self.__init__()
 
+    def get_out_edges(self, node_index: int, index_format=True) -> List:
+        out = []
+        edge_index = self.heads[node_index]
+        while edge_index != -1:
+            if index_format:
+                out.append(edge_index)
+            else:
+                out.append(self.edges[edge_index])
+            edge_index = self.edges[edge_index].pre
+        return out
+
+    def get_all_in_neighbors(self, index_format=True) -> dict:
+        out = dict()
+        for i in range(self.node_count):
+            p = self.heads[i]
+            while p != -1:
+                end_node_id = self.edges[p].end
+                if index_format:
+                    if end_node_id not in out:
+                        out[end_node_id] = [[p, i]]
+                    else:
+                        out[end_node_id].append([p, i])
+                else:
+                    end_node = self.nodes[end_node_id]
+                    begin_node = self.nodes[i]
+                    if end_node not in out:
+                        out[end_node] = [[self.edges[p], begin_node]]
+                    else:
+                        out[end_node].append([self.edges[p], begin_node])
+                p = self.edges[p].pre
+            if index_format:
+                for j in range(self.node_count):
+                    if j not in out:
+                        out[j] = []
+            else:
+                for j in self.nodes:
+                    if j not in out:
+                        out[j] = []
+        return out
+
+    def get_descendants(
+            self,
+            node_index: int,
+            edge_limit: list = None,
+            edge_select: Callable = is_edge_selected,
+            index_format=True
+    ) -> set:
+        out = set()
+        visited = set()
+        search_node_list = [node_index]
+        while search_node_list:
+            edge_index = self.heads[search_node_list[-1]]
+            visited.add(edge_index)
+            search_node_list = search_node_list[:-1]
+
+            while edge_index != -1:
+                if edge_limit is None or edge_select(self.edges[edge_index], edge_limit):
+                    if index_format:
+                        out.add(self.edges[edge_index].end)
+                    else:
+                        out.add(self.nodes[self.edges[edge_index].end])
+                    edge_index = self.edges[edge_index].pre
+                    if self.edges[edge_index].end not in visited:
+                        search_node_list.append(self.edges[edge_index].end)
+        return out
+
+    def iter_nodes(self, raw=False):
+        for i in range(self.node_count):
+            if raw:
+                out = {
+                    'node_name': i,
+                    'node_edge': [],
+                }
+            else:
+                out = {
+                    'node_name': self.index2node_name[i],
+                    'node_edge': [],
+                }
+            p = self.heads[i]
+            while p != -1:
+                if raw:
+                    out['node_edge'].append([
+                        p,
+                        self.edges[p].end,
+                    ])
+                else:
+                    out['node_edge'].append([
+                        self.edges[p].name,
+                        self.index2node_name[self.edges[p].end],
+                    ])
+                p = self.edges[p].pre
+            yield out
+
 
 if __name__ == '__main__':
     test_case_1 = [
@@ -150,9 +267,9 @@ if __name__ == '__main__':
 
     test_case_2 = [
         ['n1', 'r1', 'n2', {'kind': 'dis'}, {'kind': 'sim', 'weight': 0.92}, {'kind': 'dis'}],
-        ['n2', 'r3', 'n4', {'kind': 'dis'}, {'kind': 'dif'}, {'kind': 'dis'}],
-        ['n2', 'r2', 'n3', {'kind': 'dis'}, {'kind': 'has'}, {'kind': 'ato'}],
-        ['n1', 'r4', 'n4', {'kind': 'dis'}, {'kind': 'dif'}, {'kind': 'dis'}],
+        ['n2', 'r3', 'n4', {'kind': 'dis'}, {'kind': 'dif', 'id': 1}, {'kind': 'dis'}],
+        ['n2', 'r2', 'n3', {'kind': 'dis'}, {'kind': 'has', 'id': 2}, {'kind': 'ato'}],
+        ['n1', 'r4', 'n4', {'kind': 'dis'}, {'kind': 'dif', 'id': 3}, {'kind': 'dis'}],
     ]
 
     test_case_3 = [
