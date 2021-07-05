@@ -11,8 +11,8 @@ with open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
 with open(os.path.join(HERE, 'requirements.txt'), encoding='utf-8') as f:
     INSTALL_REQUIRES = f.read().split('\n')
 
-with open(os.path.join(HERE, 'VERSION'), encoding='utf-8') as f:
-    PACKAGE_VERSION = f.read().rstrip()
+PACKAGE_VERSION = subprocess.check_output('git describe --tags', shell=True).decode('ascii').strip()
+
 
 sha = 'Unknown'
 try:
