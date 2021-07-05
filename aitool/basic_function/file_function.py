@@ -13,7 +13,7 @@ def file_exist(file: str):
 
 
 def save_json(file: str, obj: Any) -> None:
-    path = os.path.split(file)
+    path, _ = os.path.split(file)
     if not os.path.exists(path):
         os.makedirs(path)
     with open(file, 'w', encoding='utf-8') as fw:
