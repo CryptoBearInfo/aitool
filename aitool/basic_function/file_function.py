@@ -12,12 +12,16 @@ def file_exist(file: str):
     return os.path.exists(file)
 
 
-def dump_json(obj: Any, file: str) -> None:
+def dump_json(
+        obj: Any,
+        file: str,
+        ensure_ascii:bool = False,
+) -> None:
     path, _ = os.path.split(file)
     if not os.path.exists(path):
         os.makedirs(path)
     with open(file, 'w', encoding='utf-8') as fw:
-        json.dump(obj, fw)
+        json.dump(obj, fw, ensure_ascii=ensure_ascii)
 
 
 def load_json(file: str) -> Any:
