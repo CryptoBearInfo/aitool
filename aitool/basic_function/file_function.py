@@ -5,14 +5,14 @@ import os
 import json
 import pickle
 import pandas as pd
-from typing import Any, List
+from typing import Any, List, Union
 
 
 def file_exist(file: str):
     return os.path.exists(file)
 
 
-def save_json(file: str, obj: Any) -> None:
+def dump_json(obj: Any, file: str) -> None:
     path, _ = os.path.split(file)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -28,7 +28,7 @@ def load_json(file: str) -> Any:
         return json.load(fr)
 
 
-def save_pickle(obj: Any, file: str) -> None:
+def dump_pickle(obj: Any, file: str) -> None:
     with open(file, 'wb') as fw:
         pickle.dump(obj, fw)
 
@@ -41,23 +41,33 @@ def load_pickle(file: str) -> Any:
         return pickle.load(fr)
 
 
-def read_lines(file: str) -> List[Any]:
-    with open(file, 'r', encoding='utf8') as fin:
-        data = [d.strip() for d in fin.readlines()]
-    return data
-
-
-def write_lines(data: List[Any], file: str) -> None:
+def dump_lines(data: List[Any], file: str) -> None:
     with open(file, 'w', encoding='utf8') as fout:
         for d in data:
             print(d, file=fout)
 
 
-def save_excel(
+def load_lines(file: str, separator: Union[None, str] = None) -> List[Any]:
+    data = []
+    with open(file, 'r', encoding='utf8') as fin:
+        for d in fin.readlines():
+            item = d.strip()
+            if separator:
+                item = item.split(separator)
+            data.append(item)
+    return data
+
+
+def dump_excel(
         data: List[Any],
         file: str,
-        index=False,
-        header=False
+        **kwargs,
 ) -> None:
     df = pd.DataFrame(data)
-    df.to_excel(file, index=index, header=header)
+    df.to_excel(file, **kwargs)
+
+
+def load_excel(*args, **kwargs) -> List:
+    df = pd.read_excel(*args, **kwargs)
+    data = df.values
+    return data
