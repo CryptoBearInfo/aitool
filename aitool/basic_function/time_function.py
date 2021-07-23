@@ -5,6 +5,7 @@
 # Copyright©2020-2021 xiangyuejia@qq.com All Rights Reserved
 import time
 
+
 def exe_time(print_time=False, detail=False):
     def wrapper(func):
         def decorate(*args, **kw):
@@ -19,6 +20,7 @@ def exe_time(print_time=False, detail=False):
             return back
         return decorate
     return wrapper
+
 
 if __name__ == '__main__':
     @exe_time()
