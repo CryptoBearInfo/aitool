@@ -20,8 +20,20 @@ A decorator to make single class
 def singleton(cls):
     _instance = {}
 
-    def inner():
+    def inner(*args, **kwargs):
         if cls not in _instance:
-            _instance[cls] = cls()
+            _instance[cls] = cls(*args, **kwargs)
         return _instance[cls]
     return inner
+
+
+if __name__ == '__main__':
+    @singleton
+    class A:
+        def __init__(self, x):
+            self.x = x
+
+    a = A(1)
+    b = A(2)
+    print(a)
+    print(b)
