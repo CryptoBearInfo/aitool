@@ -5,14 +5,17 @@ import os
 import json
 import pickle
 import pandas as pd
-from typing import Any, List, Union
+import inspect
+import functools
+from typing import Any, List, Union, NoReturn
+from aitool import split_dict
 
 
-def file_exist(file: str):
+def file_exist(file: str) -> bool:
     return os.path.exists(file)
 
 
-def make_dir(file: str):
+def make_dir(file: str) -> NoReturn:
     path, _ = os.path.split(file)
     if path and not os.path.exists(path):
         os.makedirs(path)
@@ -24,7 +27,7 @@ def dump_json(
         formatting: bool = False,
         ensure_ascii: bool = False,
         **kwargs,
-) -> None:
+) -> NoReturn:
     make_dir(file)
     kwargs['ensure_ascii'] = ensure_ascii
     if formatting:
@@ -43,7 +46,7 @@ def load_json(file: str, **kwargs,) -> Any:
         return json.load(fr, **kwargs,)
 
 
-def dump_pickle(obj: Any, file: str, **kwargs) -> None:
+def dump_pickle(obj: Any, file: str, **kwargs) -> NoReturn:
     make_dir(file)
     with open(file, 'wb') as fw:
         pickle.dump(obj, fw, **kwargs)
@@ -57,7 +60,7 @@ def load_pickle(file: str, **kwargs) -> Any:
         return pickle.load(fr, **kwargs)
 
 
-def dump_lines(data: List[Any], file: str) -> None:
+def dump_lines(data: List[Any], file: str) -> NoReturn:
     make_dir(file)
     with open(file, 'w', encoding='utf8') as fout:
         for d in data:
@@ -75,14 +78,29 @@ def load_lines(file: str, separator: Union[None, str] = None) -> List[Any]:
     return data
 
 
-def dump_excel(
+def dump_panda(
         data: List[Any],
         file: str,
+        file_format: str,
+        dump_index: bool = False,
         **kwargs,
-) -> None:
+) -> NoReturn:
     make_dir(file)
-    df = pd.DataFrame(data)
-    df.to_excel(file, **kwargs)
+    if 'index' in kwargs and isinstance(kwargs['index'], bool):
+        raise ValueError('The parameter `index` is for pd.DataFrame. '
+                         'If want to set the `index` for panda.to_csv/excel please use `dump_index`')
+    selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
+    df = pd.DataFrame(data, **selected_kwargs)
+    selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
+    selected_kwargs['index'] = dump_index
+    if file_format == 'excel':
+        df.to_excel(file, **selected_kwargs)
+    if file_format == 'csv':
+        df.to_csv(file, **selected_kwargs)
+
+
+dump_csv = functools.partial(dump_panda, file_format='csv')
+dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
 def load_excel(*args, **kwargs) -> List:
@@ -91,6 +109,14 @@ def load_excel(*args, **kwargs) -> List:
     return data
 
 
+def load_csv(*args, **kwargs) -> List:
+    df = pd.read_csv(*args, **kwargs)
+    data = df.values
+    return data
+
+
 if __name__ == '__main__':
-    x = [1,2,[2,4],{1:2,5:'222'}]
-    dump_json(x, 'test.json', formatting=True)
+    x = [[1, 'a'], [2, 'b']]
+    dump_csv(x, 'test.csv', dump_index=True, header=['xx', 'yy'])
+    dump_excel(x, 'test.xlsx', dump_index=True, header=['xx', 'yy'])
+    dump_csv()
