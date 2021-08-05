@@ -1,11 +1,9 @@
 # -*- coding: UTF-8 -*-
 # @Time    : 2020/10/22
 # @Author  : xiangyuejia@qq.com
-import os
-import aitool.datasets.utils
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Tuple
 
-from aitool.datasets.utils import check_integrity, download_and_extract_archive
+from aitool.basic_function.download_data.utils import check_integrity, download_and_extract_archive
 
 
 class ClassTest1:
