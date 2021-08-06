@@ -201,7 +201,7 @@ def clean_role(text: str) -> (str, int):
     if is_relationship_title(text):
         score -= 1
     if is_contains_english(text):
-        score -= 1
+        score -= 20
     if is_nick_name(text):
         score -= 1
     if is_contains_figure(text):
@@ -212,6 +212,17 @@ def clean_role(text: str) -> (str, int):
         score -= 1
     logging.info('{}, {}'.format(text, score))
     return text, score
+
+
+import sys
+from unicodedata import category
+punctuation_chars = set([chr(i) for i in range(sys.maxunicode)
+                             if category(chr(i)).startswith("P")])
+punctuation_chars |= set(['`', ' '])
+
+
+def is_punctuation(char):
+    return char in punctuation_chars
 
 
 if __name__ == '__main__':
