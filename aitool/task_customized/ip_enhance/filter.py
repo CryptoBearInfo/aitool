@@ -209,12 +209,33 @@ def clean_role(text: str) -> (str, int):
     if is_contains_figure(text):
         score -= 1
     if is_all_chinese(text):
-        score -= 1
+        score += 1
     if is_black_name(text):
         score -= 1
     logging.info('{}, {}'.format(text, score))
     return text, score
 
+
+def clean_alias(text: str) -> (str, int):
+    score = 13
+    if not text:
+        return '', -100
+    if not is_contains_chinese:
+        score -= 5
+    if is_common_word(text):
+        score -= 5
+    if is_relationship_title(text):
+        score -= 3
+    if is_contains_english(text):
+        score -= 1
+    if is_nick_name(text):
+        score -= 1
+    if is_contains_figure(text):
+        score -= 1
+    if is_all_chinese(text):
+        score += 1
+    logging.info('{}, {}'.format(text, score))
+    return text, score
 
 import sys
 from unicodedata import category
