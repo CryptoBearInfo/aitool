@@ -194,6 +194,8 @@ def clean_role(text: str) -> (str, int):
     text = delete_age_describe(text)
     if not text:
         return '', -100
+    if not is_contains_chinese:
+        return '', -100
     if has_family_name(text):
         score -= 1
     if is_common_word(text):
@@ -201,7 +203,7 @@ def clean_role(text: str) -> (str, int):
     if is_relationship_title(text):
         score -= 1
     if is_contains_english(text):
-        score -= 20
+        score -= 1
     if is_nick_name(text):
         score -= 1
     if is_contains_figure(text):
