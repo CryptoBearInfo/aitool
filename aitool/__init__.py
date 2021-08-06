@@ -26,3 +26,17 @@ from aitool.basic_function.singleton import singleton as singleton
 from aitool.basic_function.exe_time import exe_time as exe_time
 from aitool.basic_function.retry import retry
 from aitool.basic_function.timeout import timeout
+
+from aitool.task_customized.ip_enhance.role_filter import has_family_name
+from aitool.task_customized.ip_enhance.role_filter import is_common_word
+from aitool.task_customized.ip_enhance.role_filter import is_relationship_title
+from aitool.task_customized.ip_enhance.role_filter import is_contains_english
+from aitool.task_customized.ip_enhance.role_filter import cut_until_char
+from aitool.task_customized.ip_enhance.role_filter import delete_char
+from aitool.task_customized.ip_enhance.role_filter import is_nick_name
+from aitool.task_customized.ip_enhance.role_filter import is_contains_figure
+from aitool.task_customized.ip_enhance.role_filter import delete_age_describe
+from aitool.task_customized.ip_enhance.role_filter import is_contains_chinese
+from aitool.task_customized.ip_enhance.role_filter import is_all_chinese
+from aitool.task_customized.ip_enhance.role_filter import is_black_name
+from aitool.task_customized.ip_enhance.role_filter import clean_role
