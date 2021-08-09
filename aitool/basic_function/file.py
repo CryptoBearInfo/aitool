@@ -74,7 +74,7 @@ def dump_lines(data: List[Any], file: str) -> NoReturn:
             print(d, file=fout)
 
 
-def load_lines(file: str, separator: Union[None, str] = None, step=False) -> List[Any]:
+def load_lines(file: str, separator: Union[None, str] = None, step: bool = False) -> List[Any]:
     data = []
     if step:
         with open(file, 'r', encoding='utf8') as fin:
