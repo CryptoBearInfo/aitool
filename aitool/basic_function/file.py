@@ -74,15 +74,20 @@ def dump_lines(data: List[Any], file: str) -> NoReturn:
             print(d, file=fout)
 
 
-def load_lines(file: str, separator: Union[None, str] = None) -> List[Any]:
+def load_lines(file: str, separator: Union[None, str] = None, step=False) -> List[Any]:
     data = []
-    with open(file, 'r', encoding='utf8') as fin:
-        for d in fin.readlines():
-            item = d.strip()
-            if separator:
-                item = item.split(separator)
-            data.append(item)
-    return data
+    if step:
+        with open(file, 'r', encoding='utf8') as fin:
+            for line in fin:
+                yield line
+    else:
+        with open(file, 'r', encoding='utf8') as fin:
+            for d in fin.readlines():
+                item = d.strip()
+                if separator:
+                    item = item.split(separator)
+                data.append(item)
+        return data
 
 
 def dump_panda(

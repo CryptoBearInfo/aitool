@@ -25,7 +25,8 @@ from aitool.basic_function.format_data import flatten as flatten
 from aitool.basic_function.singleton import singleton as singleton
 from aitool.basic_function.exe_time import exe_time as exe_time
 from aitool.basic_function.retry import retry
-from aitool.basic_function.timeout import timeout
+from aitool.basic_function.time import timeout
+from aitool.basic_function.time import timestamp
 
 from aitool.task_customized.ip_enhance.filter import has_family_name
 from aitool.task_customized.ip_enhance.filter import is_common_word

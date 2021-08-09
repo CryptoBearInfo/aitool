@@ -17,6 +17,7 @@
 """
 from typing import Dict, Union, List, Any, NoReturn
 from time import sleep
+import time
 import sys
 import threading
 
@@ -99,6 +100,13 @@ def timeout(seconds: float, callback: Any):
     return timeout_func
 
 
+def timestamp():
+    describe = '{}'.format(time.asctime(time.localtime(time.time())))
+    describe = describe.replace('  ', '_')
+    describe = describe.replace(' ', '_')
+    return describe
+
+
 if __name__ == '__main__':
     @timeout(2.2, None)  # 限时 2 秒超时
     def connect(time):  # 要执行的函数
@@ -110,3 +118,5 @@ if __name__ == '__main__':
     print(x)
     y = connect(2.5)
     print(y)
+
+    print(timestamp())
