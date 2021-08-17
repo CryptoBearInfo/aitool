@@ -18,6 +18,7 @@
 import os
 import warnings
 import logging
+import re
 from typing import Dict, Union, List, Any, NoReturn
 from aitool.datasets import PATH as DATA_PATH
 from aitool import file_exist, load_lines, prepare_data, load_json
@@ -248,6 +249,40 @@ def is_punctuation(char):
     return char in punctuation_chars
 
 
+def delete_nested_text(
+        text: str,
+        deep_add: tuple = ('(', '（', '[', '【',),
+        deep_reduce: tuple = (')', '）', ']', '】',)
+) -> str:
+    # 删除以（）、()修饰的嵌套成分
+    new_text = ''
+    deep = 0
+    deep_add = deep_add
+    deep_reduce = deep_reduce
+    for char in text:
+        if char in deep_add:
+            deep += 1
+        if deep == 0:
+            new_text += char
+        if char in deep_reduce and deep > 0:
+            deep -= 1
+    return new_text
+
+
+pattern_1 = re.compile(r'第[1-90一二三四五六七八九十零〇]+(章|季|集|部分|部)')
+pattern_2 = re.compile(r'[:：]*[（([]*(结局一|结局二|结局三|法国版|完全版|剧场版|电影版|剧场剪辑版|印度版|合体版＋|合体版|重置版|合体剧场版|原版|正序版|精编版|粤语版|总集篇)[）)\]]*')
+pattern_3 = re.compile(r'[1-90一二三四五六七八九十零〇]+$')
+
+
+def get_core_ip(ip: str) -> str:
+    ip = delete_nested_text(ip)
+    ip = re.sub(pattern_1, '', ip)
+    ip = re.sub(pattern_2, '', ip)
+    ip = re.sub(pattern_3, '', ip)
+    ip = ip.split(' ')[0]
+    return ip
+
+
 if __name__ == '__main__':
     print(has_family_name('项羽'))
     print(has_family_name('翼德'))
@@ -262,3 +297,9 @@ if __name__ == '__main__':
     print(clean_role('汽车'))
     print(clean_role('唐三'))
     print(clean_role('唐三(主角)'))
+    print(get_core_ip('托马斯和他的朋友们第十九部分'))
+    print(get_core_ip('托马斯和他的朋友们19'))
+    print(get_core_ip('托马斯和他的朋友们结局一'))
+    print(get_core_ip('托马斯和他的朋友们(结局一))'))
+    print(get_core_ip('托马斯 和他的朋友们:(结局一)'))
+    print(get_core_ip('一'))
