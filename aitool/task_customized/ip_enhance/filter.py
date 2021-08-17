@@ -249,6 +249,23 @@ def is_punctuation(char):
     return char in punctuation_chars
 
 
+def select_nested_text(
+        text: str,
+        deep_add: tuple = ('《',),
+        deep_reduce: tuple = ('》',)
+) -> str:
+    new_text = ''
+    deep = 0
+    for char in text:
+        if char in deep_reduce and deep > 0:
+            deep -= 1
+        if deep != 0:
+            new_text += char
+        if char in deep_add:
+            deep += 1
+    return new_text
+
+
 def delete_nested_text(
         text: str,
         deep_add: tuple = ('(', '（', '[', '【',),
@@ -257,8 +274,6 @@ def delete_nested_text(
     # 删除以（）、()修饰的嵌套成分
     new_text = ''
     deep = 0
-    deep_add = deep_add
-    deep_reduce = deep_reduce
     for char in text:
         if char in deep_add:
             deep += 1
@@ -303,3 +318,4 @@ if __name__ == '__main__':
     print(get_core_ip('托马斯和他的朋友们(结局一))'))
     print(get_core_ip('托马斯 和他的朋友们:(结局一)'))
     print(get_core_ip('一'))
+    print(select_nested_text('《xxxx》'))
