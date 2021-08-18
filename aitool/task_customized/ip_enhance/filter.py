@@ -295,6 +295,7 @@ def get_core_ip(ip: str) -> str:
     ip = re.sub(pattern_2, '', ip)
     ip = re.sub(pattern_3, '', ip)
     ip = ip.split(' ')[0]
+    ip = ip.split('-')[0]
     return ip
 
 
