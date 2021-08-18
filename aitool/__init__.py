@@ -29,6 +29,8 @@ from aitool.basic_function.retry import retry
 from aitool.basic_function.time import timeout
 from aitool.basic_function.time import timestamp
 
+from aitool.basic_function.cache import cache
+
 from aitool.task_customized.ip_enhance.filter import has_family_name
 from aitool.task_customized.ip_enhance.filter import is_common_word
 from aitool.task_customized.ip_enhance.filter import is_relationship_title
