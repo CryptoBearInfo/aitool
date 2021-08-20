@@ -300,11 +300,11 @@ def get_core_ip(ip: str) -> str:
 
 
 def is_sub_ip(ip: str) -> bool:
-    if not re.search(pattern_1, ip):
+    if re.search(pattern_1, ip):
         return True
-    if not re.findall(pattern_2, ip):
+    if re.findall(pattern_2, ip):
         return True
-    if not re.findall(pattern_3, ip):
+    if re.findall(pattern_3, ip):
         return True
     return False
 
