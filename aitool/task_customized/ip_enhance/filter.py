@@ -284,8 +284,8 @@ def delete_nested_text(
     return new_text
 
 
-pattern_1 = re.compile(r'第[1-90一二三四五六七八九十零〇]+(章|季|集|部分|部)')
-pattern_2 = re.compile(r'[:：]*[（([]*(结局一|结局二|结局三|法国版|完全版|剧场版|电影版|剧场剪辑版|印度版|合体版＋|合体版|重置版|合体剧场版|原版|正序版|精编版|粤语版|总集篇)[）)\]]*')
+pattern_1 = re.compile(r'(全|第)[1-90一二三四五六七八九十零〇]+(章|季|集|部分|部|卷)')
+pattern_2 = re.compile(r'[:：]*[（([]*(结局一|结局二|结局三|法国版|完全版|剧场版|电影版|剧场剪辑版|印度版|合体版＋|合体版|重置版|合体剧场版|原版|正序版|精编版|粤语版|总集篇|电视剧版|电视剧|全集|动画版)[）)\]]*')
 pattern_3 = re.compile(r'[1-90一二三四五六七八九十零〇]+$')
 
 
@@ -328,11 +328,13 @@ if __name__ == '__main__':
     print(get_core_ip('托马斯和他的朋友们结局一'))
     print(get_core_ip('托马斯和他的朋友们(结局一))'))
     print(get_core_ip('托马斯 和他的朋友们:(结局一)'))
+    print(get_core_ip('斗罗大陆（全14卷）'))
     print(get_core_ip('一'))
     print(is_sub_ip('托马斯和他的朋友们第十九部分'))
     print(is_sub_ip('托马斯和他的朋友们19'))
     print(is_sub_ip('托马斯和他的朋友们结局一'))
     print(is_sub_ip('托马斯和他的朋友们(结局一))'))
     print(is_sub_ip('托马斯 和他的朋友们:(结局一)'))
+    print(is_sub_ip('斗罗大陆（全14卷）'))
     print(is_sub_ip('一'))
     print(select_nested_text('《xxxx》'))
