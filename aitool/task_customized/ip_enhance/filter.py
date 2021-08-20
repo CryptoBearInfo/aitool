@@ -299,6 +299,16 @@ def get_core_ip(ip: str) -> str:
     return ip
 
 
+def is_sub_ip(ip: str) -> bool:
+    if not re.search(pattern_1, ip):
+        return True
+    if not re.findall(pattern_2, ip):
+        return True
+    if not re.findall(pattern_3, ip):
+        return True
+    return False
+
+
 if __name__ == '__main__':
     print(has_family_name('项羽'))
     print(has_family_name('翼德'))
@@ -319,4 +329,10 @@ if __name__ == '__main__':
     print(get_core_ip('托马斯和他的朋友们(结局一))'))
     print(get_core_ip('托马斯 和他的朋友们:(结局一)'))
     print(get_core_ip('一'))
+    print(is_sub_ip('托马斯和他的朋友们第十九部分'))
+    print(is_sub_ip('托马斯和他的朋友们19'))
+    print(is_sub_ip('托马斯和他的朋友们结局一'))
+    print(is_sub_ip('托马斯和他的朋友们(结局一))'))
+    print(is_sub_ip('托马斯 和他的朋友们:(结局一)'))
+    print(is_sub_ip('一'))
     print(select_nested_text('《xxxx》'))

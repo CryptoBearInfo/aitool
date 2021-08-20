@@ -47,4 +47,5 @@ from aitool.task_customized.ip_enhance.filter import clean_role
 from aitool.task_customized.ip_enhance.filter import clean_alias
 from aitool.task_customized.ip_enhance.filter import delete_nested_text
 from aitool.task_customized.ip_enhance.filter import select_nested_text
+from aitool.task_customized.ip_enhance.filter import is_sub_ip
 from aitool.task_customized.ip_enhance.filter import get_core_ip
