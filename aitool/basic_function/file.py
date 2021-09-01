@@ -74,19 +74,28 @@ def dump_lines(data: List[Any], file: str) -> NoReturn:
             print(d, file=fout)
 
 
-def load_line(file: str) -> List[Any]:
+def load_line(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
     with open(file, 'r', encoding='utf8') as fin:
         for line in fin:
-            yield line
+            item = line.strip()
+            if separator:
+                if separator_time == -1:
+                    item = item.split(separator)
+                else:
+                    item = item.split(separator, separator_time)
+            yield item
 
 
-def load_lines(file: str, separator: Union[None, str] = None) -> List[Any]:
+def load_lines(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
     data = []
     with open(file, 'r', encoding='utf8') as fin:
         for d in fin.readlines():
             item = d.strip()
             if separator:
-                item = item.split(separator)
+                if separator_time == -1:
+                    item = item.split(separator)
+                else:
+                    item = item.split(separator, separator_time)
             data.append(item)
     return data
 
