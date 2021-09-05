@@ -33,6 +33,7 @@ from aitool.basic_function.cache import cache
 
 from aitool.task_customized.ip_enhance.filter import has_family_name
 from aitool.task_customized.ip_enhance.filter import is_common_word
+from aitool.task_customized.ip_enhance.filter import is_stop_word
 from aitool.task_customized.ip_enhance.filter import is_relationship_title
 from aitool.task_customized.ip_enhance.filter import is_contains_english
 from aitool.task_customized.ip_enhance.filter import cut_until_char

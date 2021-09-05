@@ -44,7 +44,6 @@ word_common = set()
 DIR_THUOCL = os.path.join(DATA_PATH, 'nlp', 'words', 'THUOCL')
 FILE_XINHUA_CI = os.path.join(DATA_PATH, 'nlp', 'words', 'XINHUA', 'ci.json')
 
-
 def init_word_common(threshold: int = 10) -> NoReturn:
     if not file_exist(DIR_THUOCL) or not file_exist(FILE_XINHUA_CI):
         prepare_data(*File_Bag, packed=True)
@@ -64,6 +63,25 @@ def is_common_word(text: str) -> bool:
     if not word_common:
         init_word_common()
     if text in word_common:
+        return True
+    return False
+
+
+word_stop = set()
+FILE_STOPWORDS = os.path.join(DATA_PATH, 'nlp', 'words', 'stopwords.txt')
+
+
+def init_word_stop() -> NoReturn:
+    with open(FILE_STOPWORDS, 'r') as fin:
+        for line in fin:
+            word = line.strip()
+            word_stop.add(word)
+
+
+def is_stop_word(text: str) -> bool:
+    if not word_stop:
+        init_word_stop()
+    if text in word_stop:
         return True
     return False
 
@@ -338,3 +356,5 @@ if __name__ == '__main__':
     print(is_sub_ip('斗罗大陆（全14卷）'))
     print(is_sub_ip('一'))
     print(select_nested_text('《xxxx》'))
+    print(is_stop_word('的'))
+    print(is_stop_word('匿'))
