@@ -15,6 +15,7 @@ from aitool.basic_function.file import dump_excel as dump_excel
 from aitool.basic_function.file import load_excel as load_excel
 from aitool.basic_function.file import dump_csv as dump_csv
 from aitool.basic_function.file import load_csv as load_csv
+from aitool.basic_function.file import load_big_data as load_big_data
 
 from aitool.basic_function.file import download_file as download_file
 from aitool.basic_function.file import zip as zip
@@ -22,6 +23,7 @@ from aitool.basic_function.file import unzip as unzip
 from aitool.basic_function.file import prepare_data as prepare_data
 
 from aitool.basic_function.format_data import flatten as flatten
+from aitool.basic_function.format_data import html2text as html2text
 
 from aitool.basic_function.singleton import singleton as singleton
 from aitool.basic_function.exe_time import exe_time as exe_time

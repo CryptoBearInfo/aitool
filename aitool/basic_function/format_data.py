@@ -16,6 +16,7 @@
 
 """
 from typing import Dict, Union, List, Any, NoReturn, Iterable, Tuple, Generator
+from bs4 import BeautifulSoup
 
 
 def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, bytes)) -> Generator:
@@ -39,6 +40,11 @@ def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, byte
                 yield item
     else:
         yield data
+
+
+def html2text(html: str):
+    content = BeautifulSoup(html, 'lxml').text
+    return content
 
 
 if __name__ == '__main__':

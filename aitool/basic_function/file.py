@@ -3,6 +3,7 @@
 # @Author  : xiangyuejia@qq.com
 import os
 import json
+import fileinput
 import pickle
 import pandas as pd
 import inspect
@@ -84,6 +85,17 @@ def load_line(file: str, separator: Union[None, str] = None, separator_time: int
                 else:
                     item = item.split(separator, separator_time)
             yield item
+
+
+def load_big_data(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
+    for line in fileinput.input([file]):
+        item = line.strip()
+        if separator:
+            if separator_time == -1:
+                item = item.split(separator)
+            else:
+                item = item.split(separator, separator_time)
+        yield item
 
 
 def load_lines(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
