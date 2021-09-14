@@ -44,6 +44,7 @@ def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, byte
 
 def html2text(html: str):
     content = BeautifulSoup(html, 'lxml').text
+    content = content.replace('\xa0', ' ')
     return content
 
 
