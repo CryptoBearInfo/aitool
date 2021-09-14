@@ -1,5 +1,6 @@
 # BASIC FUNCTION
 from aitool.basic_function.basic import split_dict
+from aitool.basic_function.basic import replace_char
 
 from aitool.basic_function.file import file_exist as file_exist
 from aitool.basic_function.file import dump_json as dump_json
