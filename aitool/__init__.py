@@ -1,6 +1,4 @@
-# -*- coding: UTF-8 -*-
-# @Time    : 2020/10/22
-# @Author  : xiangyuejia@qq.com
+# BASIC FUNCTION
 from aitool.basic_function.basic import split_dict
 
 from aitool.basic_function.file import file_exist as file_exist
@@ -52,3 +50,7 @@ from aitool.task_customized.ip_enhance.filter import delete_nested_text
 from aitool.task_customized.ip_enhance.filter import select_nested_text
 from aitool.task_customized.ip_enhance.filter import is_sub_ip
 from aitool.task_customized.ip_enhance.filter import get_core_ip
+
+
+# NLP FUNCTION
+from aitool.nlp.basic.split_sentence import split_sentence
