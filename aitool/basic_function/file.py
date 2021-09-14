@@ -4,6 +4,7 @@
 import os
 import json
 import fileinput
+import warnings
 import pickle
 import pandas as pd
 import inspect
@@ -88,6 +89,7 @@ def load_line(file: str, separator: Union[None, str] = None, separator_time: int
 
 
 def load_big_data(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
+    warnings.warn("load_big_data 和 load_line 的功能一样，但内部实现不同，推荐优先使用load_line ", DeprecationWarning)
     for line in fileinput.input([file]):
         item = line.strip()
         if separator:
@@ -112,6 +114,9 @@ def load_lines(file: str, separator: Union[None, str] = None, separator_time: in
     return data
 
 
+MAX_LENGTH_XLSX = 1048576
+
+
 def dump_panda(
         data: List[Any],
         file: str,
@@ -123,13 +128,30 @@ def dump_panda(
     if 'index' in kwargs and isinstance(kwargs['index'], bool):
         raise ValueError('The parameter `index` is for pd.DataFrame. '
                          'If want to set the `index` for panda.to_csv/excel please use `dump_index`')
-    selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
-    df = pd.DataFrame(data, **selected_kwargs)
-    selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
-    selected_kwargs['index'] = dump_index
     if file_format == 'excel':
-        df.to_excel(file, **selected_kwargs)
+        if len(data) < MAX_LENGTH_XLSX - 100:
+            selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
+            df = pd.DataFrame(data, **selected_kwargs)
+            selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
+            selected_kwargs['index'] = dump_index
+            df.to_excel(file, **selected_kwargs)
+        else:
+            piece_num = 0
+            while data:
+                piece_data = data[:MAX_LENGTH_XLSX - 100]
+                piece_file = file + '_piece_' + str(piece_num) + '.xlsx'
+                data = data[MAX_LENGTH_XLSX - 100:]
+                selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
+                df = pd.DataFrame(piece_data, **selected_kwargs)
+                selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
+                selected_kwargs['index'] = dump_index
+                df.to_excel(piece_file, **selected_kwargs)
+                piece_num += 1
     if file_format == 'csv':
+        selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
+        df = pd.DataFrame(data, **selected_kwargs)
+        selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
+        selected_kwargs['index'] = dump_index
         df.to_csv(file, **selected_kwargs)
 
 
@@ -219,4 +241,6 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
 
 
 if __name__ == '__main__':
-    pass
+    data = [[i] for i in range(26)]
+    file = 'test.xlsx'
+    dump_excel(data, file)
