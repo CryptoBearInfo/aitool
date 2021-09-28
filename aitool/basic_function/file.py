@@ -84,7 +84,7 @@ def load_line(
 ) -> List[Any]:
     with open(file, 'r', encoding='utf8') as fin:
         for line in fin:
-            item = line.strip()
+            item = line.rstrip('\n\r')
             if separator:
                 if separator_time == -1:
                     item = item.split(separator)
@@ -103,7 +103,7 @@ def load_big_data(
 ) -> List[Any]:
     warnings.warn("load_big_data 和 load_line 的功能一样，但内部实现不同，推荐优先使用load_line ", DeprecationWarning)
     for line in fileinput.input([file]):
-        item = line.strip()
+        item = line.rstrip('\n\r')
         if separator:
             if separator_time == -1:
                 item = item.split(separator)
@@ -121,7 +121,7 @@ def load_lines(
     data = []
     with open(file, 'r', encoding='utf8') as fin:
         for d in fin.readlines():
-            item = d.strip()
+            item = d.rstrip('\n\r')
             if separator:
                 if separator_time == -1:
                     item = item.split(separator)
