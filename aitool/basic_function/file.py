@@ -76,7 +76,12 @@ def dump_lines(data: List[Any], file: str) -> NoReturn:
             print(d, file=fout)
 
 
-def load_line(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
+def load_line(
+        file: str,
+        separator: Union[None, str] = None,
+        separator_time: int = -1,
+        form: str = None,
+) -> List[Any]:
     with open(file, 'r', encoding='utf8') as fin:
         for line in fin:
             item = line.strip()
@@ -85,10 +90,17 @@ def load_line(file: str, separator: Union[None, str] = None, separator_time: int
                     item = item.split(separator)
                 else:
                     item = item.split(separator, separator_time)
+            if form == 'set':
+                item = set(item)
             yield item
 
 
-def load_big_data(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
+def load_big_data(
+        file: str,
+        separator: Union[None, str] = None,
+        separator_time: int = -1,
+        form: str = None,
+) -> List[Any]:
     warnings.warn("load_big_data 和 load_line 的功能一样，但内部实现不同，推荐优先使用load_line ", DeprecationWarning)
     for line in fileinput.input([file]):
         item = line.strip()
@@ -100,7 +112,12 @@ def load_big_data(file: str, separator: Union[None, str] = None, separator_time:
         yield item
 
 
-def load_lines(file: str, separator: Union[None, str] = None, separator_time: int = -1) -> List[Any]:
+def load_lines(
+        file: str,
+        separator: Union[None, str] = None,
+        separator_time: int = -1,
+        form: str = None,
+) -> List[Any]:
     data = []
     with open(file, 'r', encoding='utf8') as fin:
         for d in fin.readlines():
@@ -111,6 +128,13 @@ def load_lines(file: str, separator: Union[None, str] = None, separator_time: in
                 else:
                     item = item.split(separator, separator_time)
             data.append(item)
+    if form == 'set':
+        data = set(data)
+    if form == 'dict':
+        print('dict格式用每行的第一个元素作为key, 其后的元素的列表作为value。'
+              '如果一行中不包含多个元素会报错。'
+              '如果有相同的第一个元素会发生覆盖。')
+        data = {item[0]: item[1:] for item in data}
     return data
 
 
@@ -241,6 +265,6 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
 
 
 if __name__ == '__main__':
-    data = [[i] for i in range(26)]
-    file = 'test.xlsx'
-    dump_excel(data, file)
+    test_data = [[i] for i in range(26)]
+    test_file = 'test.xlsx'
+    dump_excel(test_data, test_file)

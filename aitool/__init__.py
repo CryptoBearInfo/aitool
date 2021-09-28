@@ -23,6 +23,7 @@ from aitool.basic_function.file import prepare_data as prepare_data
 
 from aitool.basic_function.format_data import flatten as flatten
 from aitool.basic_function.format_data import html2text as html2text
+from aitool.basic_function.format_data import content2text as content2text
 
 from aitool.basic_function.singleton import singleton as singleton
 from aitool.basic_function.exe_time import exe_time as exe_time

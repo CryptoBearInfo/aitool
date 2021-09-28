@@ -48,6 +48,30 @@ def html2text(html: str):
     return content
 
 
+def content2text(data: Any, debug: bool = True):
+    """
+    提取以下两种数据格式中的文本部分：
+    1、html格式
+    2、'[{'info':'text'}, {'info':'text'}]'
+    :param data: 待处理的数据格式
+    :param debug: debug模式下会打印报错信息
+    :return: content中的文本格式
+    """
+    content = ''
+    try:
+        for item in eval(data):
+            if 'info' in item:
+                content += item['info']
+    except Exception as e1:
+        try:
+            content = html2text(data)
+        except Exception as e2:
+            if debug:
+                print(data)
+                print(e1, e2)
+    return content
+
+
 if __name__ == '__main__':
     # print([x for x in flatten('abc')])
     import doctest
