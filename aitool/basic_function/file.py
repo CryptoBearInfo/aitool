@@ -21,6 +21,18 @@ def file_exist(file: str) -> bool:
     return os.path.exists(file)
 
 
+def get_file(path: str) -> List[str]:
+    """
+    遍历path下的所有文件（不包括文件夹）
+    :param path: 待遍历的路径
+    :return: 文件名
+    """
+    for root, ds, fs in os.walk(path):
+        for file in fs:
+            file_path = os.path.join(root, file)
+            yield file_path
+
+
 def make_dir(file: str, is_dir=False) -> NoReturn:
     if is_dir:
         path = file
