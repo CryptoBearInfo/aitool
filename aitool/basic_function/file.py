@@ -13,8 +13,8 @@ from tqdm import tqdm
 import math
 import functools
 import zipfile
-from typing import Any, List, Union, NoReturn
-from aitool import split_dict
+from typing import Any, List, Union, NoReturn, Set
+from aitool import split_dict, Deduplication
 
 
 def file_exist(file: str) -> bool:
@@ -81,7 +81,18 @@ def load_line(
         separator: Union[None, str] = None,
         separator_time: int = -1,
         form: str = None,
-) -> List[Any]:
+        deduplication: bool = False,
+) -> Union[str, List[str], Set[str]]:
+    """
+    按行读入文件，会去掉每行末尾的换行符
+    :param file: 文件路径
+    :param separator: 用separator切分每行内容，None表示不做切分
+    :param separator_time: 控制separator的切分次数，-1表示不限制次数
+    :param form: 若为'set'会用set格式输出每行的结果
+    :param deduplication: 若为True，将不输出重复的行
+    :return: 文件每行的内容
+    """
+    cache = Deduplication()
     with open(file, 'r', encoding='utf8') as fin:
         for line in fin:
             item = line.rstrip('\n\r')
@@ -90,6 +101,8 @@ def load_line(
                     item = item.split(separator)
                 else:
                     item = item.split(separator, separator_time)
+            if deduplication and cache.is_duplication(item):
+                continue
             if form == 'set':
                 item = set(item)
             yield item
@@ -100,8 +113,19 @@ def load_big_data(
         separator: Union[None, str] = None,
         separator_time: int = -1,
         form: str = None,
-) -> List[Any]:
-    warnings.warn("load_big_data 和 load_line 的功能一样，但内部实现不同，推荐优先使用load_line ", DeprecationWarning)
+        deduplication: bool = False,
+) -> Union[str, List[str], Set[str]]:
+    """
+    按行读入文件，会去掉每行末尾的换行符
+    :param file: 文件路径
+    :param separator: 用separator切分每行内容，None表示不做切分
+    :param separator_time: 控制separator的切分次数，-1表示不限制次数
+    :param form: 若为'set'会用set格式输出每行的结果
+    :param deduplication: 若为True，将不输出重复的行
+    :return: 文件每行的内容
+    """
+    warnings.warn("推荐使用load_line", DeprecationWarning)
+    cache = Deduplication()
     for line in fileinput.input([file]):
         item = line.rstrip('\n\r')
         if separator:
@@ -109,6 +133,10 @@ def load_big_data(
                 item = item.split(separator)
             else:
                 item = item.split(separator, separator_time)
+        if deduplication and cache.is_duplication(item):
+            continue
+        if form == 'set':
+            item = set(item)
         yield item
 
 
@@ -117,8 +145,10 @@ def load_lines(
         separator: Union[None, str] = None,
         separator_time: int = -1,
         form: str = None,
+        deduplication: bool = False,
 ) -> List[Any]:
     data = []
+    cache = Deduplication()
     with open(file, 'r', encoding='utf8') as fin:
         for d in fin.readlines():
             item = d.rstrip('\n\r')
@@ -127,6 +157,8 @@ def load_lines(
                     item = item.split(separator)
                 else:
                     item = item.split(separator, separator_time)
+            if deduplication and cache.is_duplication(item):
+                continue
             data.append(item)
     if form == 'set':
         data = set(data)
