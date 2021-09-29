@@ -96,28 +96,26 @@ def load_line(
     """
     cache = Deduplication()
 
-    def inner_line_process(_line):
-        item = _line.rstrip('\n\r')
-        if separator:
-            if separator_time == -1:
-                item = item.split(separator)
-            else:
-                item = item.split(separator, separator_time)
-        if form == 'set':
-            item = set(item)
-        return item
-
-    if use_open:
-        with open(file, 'r', encoding='utf8') as fin:
-            for line in fin:
-                if deduplication and cache.is_duplication(line):
-                    continue
-                yield inner_line_process(line)
-    else:
-        for line in fileinput.input([file]):
+    def inner_line_process(_file_iterator):
+        for line in _file_iterator:
             if deduplication and cache.is_duplication(line):
                 continue
-            yield inner_line_process(line)
+            item = line.rstrip('\n\r')
+            if separator:
+                if separator_time == -1:
+                    item = item.split(separator)
+                else:
+                    item = item.split(separator, separator_time)
+            if form == 'set':
+                item = set(item)
+            yield item
+
+    if use_open:
+        file_iterator = open(file, 'r', encoding='utf8')
+    else:
+        file_iterator = fileinput.input([file])
+    yield from inner_line_process(file_iterator)
+    file_iterator.close()
 
 
 def load_big_data(
@@ -303,6 +301,8 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
 
 
 if __name__ == '__main__':
-    test_data = [[i] for i in range(26)]
-    test_file = 'test.xlsx'
-    dump_excel(test_data, test_file)
+    # test_data = [[i] for i in range(26)]
+    # test_file = 'test.xlsx'
+    # dump_excel(test_data, test_file)
+    for text in load_line('A.log'):
+        print(text)
