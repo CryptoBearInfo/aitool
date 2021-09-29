@@ -82,6 +82,7 @@ def load_line(
         separator_time: int = -1,
         form: str = None,
         deduplication: bool = False,
+        use_open: bool = False,
 ) -> Union[str, List[str], Set[str]]:
     """
     按行读入文件，会去掉每行末尾的换行符
@@ -90,22 +91,33 @@ def load_line(
     :param separator_time: 控制separator的切分次数，-1表示不限制次数
     :param form: 若为'set'会用set格式输出每行的结果
     :param deduplication: 若为True，将不输出重复的行
+    :param use_open: 若为False，将用fileinput打开文件，而非用open
     :return: 文件每行的内容
     """
     cache = Deduplication()
-    with open(file, 'r', encoding='utf8') as fin:
-        for line in fin:
-            item = line.rstrip('\n\r')
-            if separator:
-                if separator_time == -1:
-                    item = item.split(separator)
-                else:
-                    item = item.split(separator, separator_time)
-            if deduplication and cache.is_duplication(item):
+
+    def inner_line_process(_line):
+        item = _line.rstrip('\n\r')
+        if separator:
+            if separator_time == -1:
+                item = item.split(separator)
+            else:
+                item = item.split(separator, separator_time)
+        if form == 'set':
+            item = set(item)
+        return item
+
+    if use_open:
+        with open(file, 'r', encoding='utf8') as fin:
+            for line in fin:
+                if deduplication and cache.is_duplication(line):
+                    continue
+                yield inner_line_process(line)
+    else:
+        for line in fileinput.input([file]):
+            if deduplication and cache.is_duplication(line):
                 continue
-            if form == 'set':
-                item = set(item)
-            yield item
+            yield inner_line_process(line)
 
 
 def load_big_data(
@@ -124,20 +136,14 @@ def load_big_data(
     :param deduplication: 若为True，将不输出重复的行
     :return: 文件每行的内容
     """
-    warnings.warn("推荐使用load_line", DeprecationWarning)
-    cache = Deduplication()
-    for line in fileinput.input([file]):
-        item = line.rstrip('\n\r')
-        if separator:
-            if separator_time == -1:
-                item = item.split(separator)
-            else:
-                item = item.split(separator, separator_time)
-        if deduplication and cache.is_duplication(item):
-            continue
-        if form == 'set':
-            item = set(item)
-        yield item
+    warnings.warn("已合并到load_line，可通过use_open=False调用", DeprecationWarning)
+    yield from load_line(
+        file=file,
+        separator=separator,
+        separator_time=separator_time,
+        form=form,
+        deduplication=deduplication,
+    )
 
 
 def load_lines(
@@ -150,15 +156,15 @@ def load_lines(
     data = []
     cache = Deduplication()
     with open(file, 'r', encoding='utf8') as fin:
-        for d in fin.readlines():
-            item = d.rstrip('\n\r')
+        for line in fin.readlines():
+            if deduplication and cache.is_duplication(line):
+                continue
+            item = line.rstrip('\n\r')
             if separator:
                 if separator_time == -1:
                     item = item.split(separator)
                 else:
                     item = item.split(separator, separator_time)
-            if deduplication and cache.is_duplication(item):
-                continue
             data.append(item)
     if form == 'set':
         data = set(data)
