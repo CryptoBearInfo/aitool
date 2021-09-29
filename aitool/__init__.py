@@ -1,6 +1,7 @@
 # BASIC FUNCTION
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.basic import replace_char
+from aitool.basic_function.basic import is_appear
 
 from aitool.basic_function.security import encrypt_md5
 

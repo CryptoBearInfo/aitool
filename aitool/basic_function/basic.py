@@ -90,5 +90,12 @@ class ReplaceChar:
 replace_char = ReplaceChar.replace_build_in
 
 
+def is_appear(text: str, traits: List[str]) -> bool:
+    for trait in traits:
+        if trait in text:
+            return True
+    return False
+
+
 if __name__ == '__main__':
     ReplaceChar.evaluate()
