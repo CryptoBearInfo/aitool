@@ -13,7 +13,7 @@ from tqdm import tqdm
 import math
 import functools
 import zipfile
-from typing import Any, List, Union, NoReturn, Set
+from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
 from aitool import split_dict, Deduplication
 
 
@@ -88,22 +88,55 @@ def dump_lines(data: List[Any], file: str) -> NoReturn:
             print(d, file=fout)
 
 
+class Accessor:
+    """
+    用于打开文件
+    """
+    def __init__(self, file: str, open_method: str = 'fileinput') -> NoReturn:
+        self.file = file
+        self.iterator = None
+        if open_method == 'open':
+            self.iterator = open(self.file, 'r', encoding='utf8')
+        if open_method == 'fileinput':
+            self.iterator = fileinput.input([self.file])
+
+    def __enter__(self) -> Iterator:
+        return self.iterator
+
+    def get_iterator(self) -> Iterator:
+        return self.iterator
+
+    def close(self) -> NoReturn:
+        if self.iterator:
+            self.iterator.close()
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> NoReturn:
+        self.close()
+
+
+def repeat(item: Any) -> Any:
+    """
+    原样返回输入，用于作为Callable参数的默认值
+    """
+    return item
+
+
 def load_line(
         file: str,
         separator: Union[None, str] = None,
-        separator_time: int = -1,
-        form: str = None,
+        max_split: int = -1,
         deduplication: bool = False,
-        use_open: bool = False,
-) -> Union[str, List[str], Set[str]]:
+        line_processor: Callable = repeat,
+        open_method: str = 'open',
+) -> Iterator:
     """
     按行读入文件，会去掉每行末尾的换行符
     :param file: 文件路径
     :param separator: 用separator切分每行内容，None表示不做切分
-    :param separator_time: 控制separator的切分次数，-1表示不限制次数
-    :param form: 若为'set'会用set格式输出每行的结果
+    :param max_split: 控制separator的切分次数，-1表示不限制次数
+    :param line_processor: 一个函数，对separator的结果做处理
     :param deduplication: 若为True，将不输出重复的行
-    :param use_open: 若为False，将用fileinput打开文件，而非用open
+    :param open_method: 指定打开文件的方法
     :return: 文件每行的内容
     """
     cache = Deduplication()
@@ -114,20 +147,11 @@ def load_line(
                 continue
             item = line.rstrip('\n\r')
             if separator:
-                if separator_time == -1:
-                    item = item.split(separator)
-                else:
-                    item = item.split(separator, separator_time)
-            if form == 'set':
-                item = set(item)
-            yield item
+                item = item.split(separator, max_split)
+            yield line_processor(item)
 
-    if use_open:
-        file_iterator = open(file, 'r', encoding='utf8')
-    else:
-        file_iterator = fileinput.input([file])
-    yield from inner_line_process(file_iterator)
-    file_iterator.close()
+    with Accessor(file, open_method=open_method) as file_iterator:
+        yield from inner_line_process(file_iterator)
 
 
 def load_big_data(
@@ -316,5 +340,5 @@ if __name__ == '__main__':
     # test_data = [[i] for i in range(26)]
     # test_file = 'test.xlsx'
     # dump_excel(test_data, test_file)
-    for text in load_line('A.log'):
+    for text in load_line('A.log', separator=' '):
         print(text)
