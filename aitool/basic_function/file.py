@@ -157,26 +157,18 @@ def load_line(
 def load_big_data(
         file: str,
         separator: Union[None, str] = None,
-        separator_time: int = -1,
-        form: str = None,
+        max_split: int = -1,
         deduplication: bool = False,
+        line_processor: Callable = repeat,
 ) -> Union[str, List[str], Set[str]]:
-    """
-    按行读入文件，会去掉每行末尾的换行符
-    :param file: 文件路径
-    :param separator: 用separator切分每行内容，None表示不做切分
-    :param separator_time: 控制separator的切分次数，-1表示不限制次数
-    :param form: 若为'set'会用set格式输出每行的结果
-    :param deduplication: 若为True，将不输出重复的行
-    :return: 文件每行的内容
-    """
     warnings.warn("已合并到load_line，可通过use_open=False调用", DeprecationWarning)
     yield from load_line(
         file=file,
         separator=separator,
-        separator_time=separator_time,
-        form=form,
+        max_split=max_split,
+        line_processor=line_processor,
         deduplication=deduplication,
+        open_method='fileinput',
     )
 
 
@@ -340,5 +332,5 @@ if __name__ == '__main__':
     # test_data = [[i] for i in range(26)]
     # test_file = 'test.xlsx'
     # dump_excel(test_data, test_file)
-    for text in load_line('A.log', separator=' '):
+    for text in load_big_data('A.log', separator=' '):
         print(text)
