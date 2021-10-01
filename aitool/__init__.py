@@ -3,6 +3,8 @@ from aitool.basic_function.basic import split_dict
 from aitool.basic_function.basic import replace_char
 from aitool.basic_function.basic import is_appear
 
+from aitool.basic_function.string import find_all_position
+
 from aitool.basic_function.security import encrypt_md5
 
 from aitool.basic_function.deduplication import Deduplication
