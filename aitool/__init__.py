@@ -10,6 +10,8 @@ from aitool.basic_function.security import encrypt_md5
 from aitool.basic_function.deduplication import Deduplication
 
 from aitool.basic_function.file import file_exist as file_exist
+from aitool.basic_function.file import get_file as get_file
+
 from aitool.basic_function.file import dump_json as dump_json
 from aitool.basic_function.file import load_json as load_json
 from aitool.basic_function.file import dump_pickle as dump_pickle
