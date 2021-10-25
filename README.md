@@ -7,7 +7,7 @@
 
 AITool is a Python package that provides two high-level features:
 - 封装了有百种算法（包括动态规划、统计模型、深度学习等等）
-- 每种算法都自带数据，便于验证和使用
+- 每种算法都自带数据，便于验证和使用。
 - Encapsulates hundreds of algorithms. (Including dynamic programming, statistical models, deep learning, etc.)
 - Each algorithm comes with its own data for easy verification and use.
 
@@ -28,6 +28,7 @@ aitool -
 ```shell script
 pip install aitool
 ```
+
 
 ## Getting Started
 ```shell script
