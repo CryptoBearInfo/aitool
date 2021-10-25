@@ -1,3 +1,6 @@
+# DATA
+from aitool.datasets import PATH as DATAPATH
+
 # BASIC FUNCTION
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.basic import replace_char
