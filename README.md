@@ -17,13 +17,7 @@ aitool -
 
 - [Motivation](#motivation)
 - [Installation](#installation)
-```shell script
-pip install aitool
-```
 - [Getting Started](#getting-started)
-```shell script
-# Todo
-```
 - [Communication](#communication)
 - [Releases and Contributing](#releases-and-contributing)
 - [The Team](#the-team)
@@ -31,8 +25,14 @@ pip install aitool
 ## Motivation
 
 ## Installation
+```shell script
+pip install aitool
+```
 
 ## Getting Started
+```shell script
+# Todo
+```
 
 ## Communication
 
