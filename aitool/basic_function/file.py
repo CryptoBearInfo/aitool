@@ -20,8 +20,8 @@ from aitool import split_dict, Deduplication
 def is_file_exist(file: str) -> bool:
     """
     判断文件名是否存在
-    :param file:文件路径
-    :return:bool
+    :param file: 文件名
+    :return: bool
     """
     return os.path.exists(file)
 
@@ -29,7 +29,7 @@ def is_file_exist(file: str) -> bool:
 def file_exist(file: str) -> bool:
     """
     判断文件名是否存在
-    :param file: 文件路径
+    :param file: 文件名
     :return: bool
     """
     print('out of data, please use is_file_exist')
@@ -54,7 +54,7 @@ def make_dir(file: str, is_dir=False) -> NoReturn:
     创建文件夹
     :param file: 文件名
     :param is_dir: 是否为文件
-    :return: 创建文件
+    :return: NoReturn
     """
     if is_dir:
         path = file
@@ -74,11 +74,11 @@ def dump_json(
     """
     写入json文件
     :param obj: 任意对象
-    :param file: 存入路径
-    :param formatting:
-    :param ensure_ascii:
-    :param kwargs:
-    :return: json文件
+    :param file: 存入文件
+    :param formatting: dump with data-interchange format
+    :param ensure_ascii: ensure ascii or not
+    :param kwargs: dict-formatted parameters
+    :return: NoReturn
     """
     make_dir(file)
     kwargs['ensure_ascii'] = ensure_ascii
