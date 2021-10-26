@@ -9,8 +9,7 @@ AITool is a Python package that provides two high-level features:
 - 封装了有百种算法（包括动态规划、统计模型、深度学习等等）
 - 每种算法都自带数据，便于验证和使用。
 - Encapsulates hundreds of algorithms. (Including dynamic programming, statistical models, deep learning, etc.)
-- Each algorithm comes with its own data for easy verification and use.
-- Each algorithm comes with its own data for easy verification and use。
+- Each algorithm comes with its own data for easy verification and use
 
 aitool - 
 [官方主页](https://deepgameai.github.io/2020-02-28-test-markdown/) - 
