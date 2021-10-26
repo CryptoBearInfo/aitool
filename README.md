@@ -2,7 +2,7 @@
 
 --------------------------------------------------------------------------------
 
-[![version](https://badgen.net/badge/version/0.0.1/blue)](https://aitool20201028.readthedocs.io/en/latest/)
+[![version](https://badgen.net/badge/version/0.0.1/blue)](https://aitool20201028.readthedocs.io/en/latest/).
 [![stars](https://img.shields.io/github/stars/deepgameai/aitool?style=social)]()
 
 AITool is a Python package that provides two high-level features:
