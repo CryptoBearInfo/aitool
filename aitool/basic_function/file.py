@@ -17,8 +17,24 @@ from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
 from aitool import split_dict, Deduplication
 
 
-def file_exist(file: str) -> bool:
+def is_file_exist(file: str) -> bool:
+    """
+    判断文件名是否存在
+    :param file:文件路径
+    :return:bool
+    """
     return os.path.exists(file)
+
+
+def file_exist(file: str) -> bool:
+    """
+    判断文件名是否存在
+    :param file: 文件路径
+    :return: bool
+    """
+    print('out of data, please use is_file_exist')
+    warnings.warn("已改名为is_file_exist", DeprecationWarning)
+    return is_file_exist(file)
 
 
 def get_file(path: str) -> List[str]:
@@ -34,6 +50,12 @@ def get_file(path: str) -> List[str]:
 
 
 def make_dir(file: str, is_dir=False) -> NoReturn:
+    """
+    创建文件夹
+    :param file: 文件名
+    :param is_dir: 是否为文件
+    :return: 创建文件
+    """
     if is_dir:
         path = file
     else:
@@ -49,6 +71,15 @@ def dump_json(
         ensure_ascii: bool = False,
         **kwargs,
 ) -> NoReturn:
+    """
+    写入json文件
+    :param obj: 任意对象
+    :param file: 存入路径
+    :param formatting:
+    :param ensure_ascii:
+    :param kwargs:
+    :return: json文件
+    """
     make_dir(file)
     kwargs['ensure_ascii'] = ensure_ascii
     if formatting:

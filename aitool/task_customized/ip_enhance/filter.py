@@ -21,7 +21,7 @@ import logging
 import re
 from typing import Dict, Union, List, Any, NoReturn
 from aitool.datasets import PATH as DATA_PATH
-from aitool import file_exist, load_lines, prepare_data, load_json
+from aitool import is_file_exist, load_lines, prepare_data, load_json
 
 
 chinese_family_name = set()
@@ -31,7 +31,7 @@ File_Chinese_Family_Name = os.path.join(DATA_PATH, 'nlp', 'words', 'Names', 'Chi
 
 def has_family_name(name: str) -> bool:
     if not chinese_family_name:
-        if not file_exist(File_Chinese_Family_Name):
+        if not is_file_exist(File_Chinese_Family_Name):
             prepare_data(*File_Bag, packed=True)
         for item in load_lines(File_Chinese_Family_Name):
             chinese_family_name.add(item)
@@ -45,7 +45,7 @@ DIR_THUOCL = os.path.join(DATA_PATH, 'nlp', 'words', 'THUOCL')
 FILE_XINHUA_CI = os.path.join(DATA_PATH, 'nlp', 'words', 'XINHUA', 'ci.json')
 
 def init_word_common(threshold: int = 10) -> NoReturn:
-    if not file_exist(DIR_THUOCL) or not file_exist(FILE_XINHUA_CI):
+    if not is_file_exist(DIR_THUOCL) or not is_file_exist(FILE_XINHUA_CI):
         prepare_data(*File_Bag, packed=True)
     files = os.listdir(DIR_THUOCL)
     for file in files:
@@ -91,7 +91,7 @@ FILE_RELATIONSHIP = os.path.join(DATA_PATH, 'nlp', 'words', 'Names', 'relationsh
 
 
 def init_relationship_title() -> NoReturn:
-    if not file_exist(FILE_RELATIONSHIP):
+    if not is_file_exist(FILE_RELATIONSHIP):
         prepare_data(*File_Bag, packed=True)
     relationship_title_addition = {'店长', '法师', '醫生', '大力士', '护士', '父亲', '天后', '教练', '保安', '计师', '管事',
                                    '知事', '道长', '妃', '母亲', '头目', '乞丐', '妻', '局长', '官员', '', '', '', '', '',
