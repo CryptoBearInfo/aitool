@@ -105,7 +105,7 @@ def dump_json(
     :return: NoReturn
     """
     if format_postfix:
-        if file[:-5] != '.json':
+        if file[-5:] != '.json':
             print('rename file name with tail .json')
             file = file + '.json'
     make_dir(file)
@@ -133,7 +133,7 @@ def dump_pickle(
         **kwargs,
 ) -> NoReturn:
     if format_postfix:
-        if file[:-4] != '.pkl':
+        if file[-4:] != '.pkl':
             print('rename file name with tail .pkl')
             file = file + '.pkl'
     make_dir(file)
@@ -286,11 +286,11 @@ def dump_panda(
 ) -> NoReturn:
     if format_postfix:
         if file_format == 'excel':
-            if file[:-5] != '.xlsx':
+            if file[-5:] != '.xlsx':
                 print('rename file name with tail .xlsx')
                 file = file + '.xlsx'
         if file_format == 'csv':
-            if file[:-4] != '.csv':
+            if file[-4:] != '.csv':
                 print('rename file name with tail .csv')
                 file = file + '.csv'
     make_dir(file)
