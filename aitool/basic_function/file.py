@@ -91,6 +91,7 @@ def dump_json(
         file: str,
         formatting: bool = False,
         ensure_ascii: bool = False,
+        format_postfix: bool = True,
         **kwargs,
 ) -> NoReturn:
     """
@@ -99,9 +100,14 @@ def dump_json(
     :param file: 存入文件
     :param formatting: dump with data-interchange format
     :param ensure_ascii: ensure ascii or not
+    :param format_postfix: rename file name with tail .json
     :param kwargs: dict-formatted parameters
     :return: NoReturn
     """
+    if format_postfix:
+        if file[:-5] != '.json':
+            print('rename file name with tail .json')
+            file = file + '.json'
     make_dir(file)
     kwargs['ensure_ascii'] = ensure_ascii
     if formatting:
@@ -120,7 +126,16 @@ def load_json(file: str, **kwargs,) -> Any:
         return json.load(fr, **kwargs,)
 
 
-def dump_pickle(obj: Any, file: str, **kwargs) -> NoReturn:
+def dump_pickle(
+        obj: Any,
+        file: str,
+        format_postfix: bool = True,
+        **kwargs,
+) -> NoReturn:
+    if format_postfix:
+        if file[:-4] != '.pkl':
+            print('rename file name with tail .pkl')
+            file = file + '.pkl'
     make_dir(file)
     with open(file, 'wb') as fw:
         pickle.dump(obj, fw, **kwargs)
@@ -134,7 +149,10 @@ def load_pickle(file: str, **kwargs) -> Any:
         return pickle.load(fr, **kwargs)
 
 
-def dump_lines(data: List[Any], file: str) -> NoReturn:
+def dump_lines(
+        data: List[Any],
+        file: str,
+) -> NoReturn:
     make_dir(file)
     with open(file, 'w', encoding='utf8') as fout:
         for d in data:
@@ -263,9 +281,20 @@ def dump_panda(
         file: str,
         file_format: str,
         dump_index: bool = False,
+        format_postfix: bool = True,
         **kwargs,
 ) -> NoReturn:
+    if format_postfix:
+        if file_format == 'excel':
+            if file[:-5] != '.xlsx':
+                print('rename file name with tail .xlsx')
+                file = file + '.xlsx'
+        if file_format == 'csv':
+            if file[:-4] != '.csv':
+                print('rename file name with tail .csv')
+                file = file + '.csv'
     make_dir(file)
+
     if 'index' in kwargs and isinstance(kwargs['index'], bool):
         raise ValueError('The parameter `index` is for pd.DataFrame. '
                          'If want to set the `index` for panda.to_csv/excel please use `dump_index`')
