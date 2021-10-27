@@ -4,6 +4,7 @@ from aitool.datasets import PATH as DATAPATH
 # BASIC FUNCTION
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.basic import replace_char
+from aitool.basic_function.basic import split_char
 from aitool.basic_function.basic import is_appear
 
 from aitool.basic_function.string import find_all_position
@@ -14,6 +15,8 @@ from aitool.basic_function.deduplication import Deduplication
 
 from aitool.basic_function.file import file_exist as file_exist
 from aitool.basic_function.file import is_file_exist as is_file_exist
+from aitool.basic_function.file import is_file as is_file
+from aitool.basic_function.file import is_dir as is_dir
 from aitool.basic_function.file import get_file as get_file
 
 from aitool.basic_function.file import dump_json as dump_json

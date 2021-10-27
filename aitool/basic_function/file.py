@@ -17,6 +17,28 @@ from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
 from aitool import split_dict, Deduplication
 
 
+def is_file(path: str) -> bool:
+    """
+    判断是否是个文件，如果是文件夹或不存在则返回False
+    :param path:
+    :return:
+    """
+    if os.path.isfile(path):
+        return True
+    return False
+
+
+def is_dir(path: str) -> bool:
+    """
+    判断是否是个文件，如果是文件夹或不存在则返回False
+    :param path:
+    :return:
+    """
+    if os.path.isdir(path):
+        return True
+    return False
+
+
 def is_file_exist(file: str) -> bool:
     """
     判断文件名是否存在

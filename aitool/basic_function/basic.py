@@ -31,6 +31,11 @@ def split_dict(data: Dict, keys: List['str']) -> (Dict, Dict):
     return selected_dict, abandon_dict
 
 
+def split_char(chars, text):
+    chars = re.compile(r'[ ' + chars + r']')
+    return re.split(chars, text)
+
+
 class ReplaceChar:
     # 将text中的old字符（可以有多个）替换为new字符（只能有一个）
     # 实验发现用replace_build_in速度最快

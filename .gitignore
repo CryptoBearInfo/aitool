@@ -134,3 +134,4 @@ dmypy.json
 application
 aitool/datasets/nlp
 aitool/datasets/tmp
+tmp*
