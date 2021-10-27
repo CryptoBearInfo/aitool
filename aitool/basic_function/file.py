@@ -28,7 +28,7 @@ def is_file(path: str) -> bool:
     return False
 
 
-def is_dir(path: str) -> bool:
+def is_folder(path: str) -> bool:
     """
     判断是否是个文件，如果是文件夹或不存在则返回False
     :param path:
@@ -48,6 +48,19 @@ def is_file_exist(file: str) -> bool:
     return os.path.exists(file)
 
 
+def is_file_hidden(file: str) -> bool:
+    """
+    TODO 有遗漏
+    目前仅能识别以.开始的隐藏文件
+    :param file:
+    :return:
+    """
+    path, filename = os.path.split(file)
+    if filename[0] == '.':
+        return True
+    return False
+
+
 def file_exist(file: str) -> bool:
     """
     判断文件名是否存在
@@ -59,15 +72,21 @@ def file_exist(file: str) -> bool:
     return is_file_exist(file)
 
 
-def get_file(path: str) -> List[str]:
+def get_file(
+        path: str,
+        skip_hidden: bool = True,
+        skip_folder: bool = True,
+) -> Iterator[str]:
     """
     遍历path下的所有文件（不包括文件夹）
     :param path: 待遍历的路径
-    :return: 文件名
+    :return: 一个返回文件名的迭代器
     """
     for root, ds, fs in os.walk(path):
         for file in fs:
             file_path = os.path.join(root, file)
+            if skip_hidden and is_file_hidden(file_path):
+                continue
             yield file_path
 
 
