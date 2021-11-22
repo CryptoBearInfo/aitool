@@ -135,3 +135,5 @@ application
 aitool/datasets/nlp
 aitool/datasets/tmp
 tmp*
+aitool/nlp/string_recall/bktree/dataset/drug
+aitool/nlp/string_recall/bktree/dataset/icd10
