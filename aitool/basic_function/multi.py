@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-
+偶尔会需要把代码改为多进程。
+但每次改造都要费不少时间。
+于是想开发个工具，3分钟完成改造。
 """
 import functools
 from collections.abc import Iterable
