@@ -26,12 +26,17 @@ for function in multi(functions):
 
 ### 目录（可直接运行）
 
+- [环境配置](#环境配置)
 - [multi的简单例子](#multi的简单例子)
 - [multi的按序输出例子](#multi的按序输出例子)
 - [get_functions的简单例子](#get_functions的简单例子)
 - [get_functions的通常用法](#get_functions的通常用法)
 - [multi的通常用法](#multi的通常用法)
 
+### 环境配置
+```shell script
+pip install aitool
+```
 ### multi的简单例子
 - 由于是多进程，输出顺序不固定
 ```python
