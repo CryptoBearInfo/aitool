@@ -79,7 +79,7 @@ def toy_2(x=3, y=4):
     sleep(random())
     return x, y
 
-for result in multi([toy_1, toy_2]):
+for result in multi([toy_1, toy_2], ordered=True):
     print(result)
 ```
 > 输出
