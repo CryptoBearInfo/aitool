@@ -91,6 +91,7 @@ class ClassTest1:
     def extra_repr(self) -> str:
         return "Split: {}".format("Train" if self.train is True else "Test")
 
+
 if __name__ == '__main__':
     import os
     os.environ["HTTPS_PROXY"] = "http://127.0.0.1:12639"

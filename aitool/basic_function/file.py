@@ -6,6 +6,7 @@ import json
 import fileinput
 import warnings
 import pickle
+import numpy as np
 import pandas as pd
 import inspect
 import requests
@@ -349,8 +350,12 @@ dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
 def load_excel(*args, **kwargs) -> List:
-    df = pd.read_excel(*args, **kwargs)
-    data = df.values
+    data = np.array([])
+    try:
+        df = pd.read_excel(*args, **kwargs)
+        data = df.values
+    except ValueError as err:
+        print(err)
     return data
 
 
