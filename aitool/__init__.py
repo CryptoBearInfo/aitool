@@ -48,7 +48,14 @@ from aitool.basic_function.retry import retry
 from aitool.basic_function.time import timeout
 from aitool.basic_function.time import timestamp
 
-from aitool.basic_function.cache import cache
+# cache 管理工具
+from aitool.basic_function.cache import cache  # 装饰器
+from aitool.basic_function.cache import get_cache
+from aitool.basic_function.cache import Cache
+
+# 多进程
+from aitool.basic_function.multi import get_functions
+from aitool.basic_function.multi import multi
 
 from aitool.task_customized.ip_enhance.filter import has_family_name
 from aitool.task_customized.ip_enhance.filter import is_common_word
