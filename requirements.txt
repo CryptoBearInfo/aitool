@@ -5,3 +5,4 @@ numpy
 python-Levenshtein
 bs4
 openpyxl
+multiprocess
