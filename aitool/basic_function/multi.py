@@ -71,7 +71,7 @@ def get_functions(_func: Callable, /, _iter: Iterable) -> Iterable:
 
 def _return_2_queue(function: Callable, index: int, queue) -> NoReturn:
     """
-    对function做封装，将function的执行结果纯粹到管道queue里。
+    对function做封装，将function的执行结果储存到管道queue里。
     :param function: 被封装的函数
     :param index: function的序号
     :param queue: 管道，用于和父进程通信

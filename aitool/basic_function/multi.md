@@ -12,6 +12,27 @@
 
 评测详情请参考：[原生方法和multi方法的对比](#原生方法和multi方法的对比)。
 
+### 一个简单的例子
+假如函数toy需要被多次调用：
+```python
+def toy(x, y=1):
+    return x, y
+```
+顺序执行的写法：
+```python
+for i in range(3):
+    print(toy(i))
+```
+并行执行的写法：
+```python
+# 获取所有要执行的函数
+functions = get_functions(toy, range(3))
+# 多进程执行
+for result in multi(functions):
+    print(result)
+```
+
+
 ### How To Use
 
 - [环境配置](#环境配置)
