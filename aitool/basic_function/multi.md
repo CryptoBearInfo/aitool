@@ -63,42 +63,11 @@ for result in multi_map(toy, [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]):
 > multi_map基于multi和get_functions实现
 
 - [multi基本用法](#multi基本用法)
-- [multi按序输出](#multi按序输出)
 - [get_functions基本用法](#get_functions基本用法)
 - [get_functions通常用法](#get_functions通常用法)
 - [multi通常用法](#multi通常用法)
 
 ### multi基本用法
-- 由于是多进程，输出顺序不固定
-
-```python
-from time import sleep
-from random import random
-from aitool import multi
-
-
-def toy_1(x=1, y=2):
-    sleep(random())
-    return x, y
-
-
-def toy_2(x=3, y=4):
-    sleep(random())
-    return x, y
-
-
-for result in multi([toy_1, toy_2]):
-    print(result)
-```
-> 输出
-```text
-(3, 4)
-(1, 2)
-```
-
-### multi按序输出
-- 如果需要输出保持原有顺序，只需要设置`ordered=True`。
-- 输出一定是按序的
 
 ```python
 from time import sleep
@@ -159,17 +128,18 @@ from random import random
 from aitool import get_functions
 
 
-def toy(x, y=1):
+def toy(x=-1, y=1):
     sleep(random())
     return x, y
 
 
-condition = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
+condition = [None, 1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
 for function in get_functions(toy, condition):
     print(function())
 ```
 > 输出
 ```text
+(-1, 1)
 (1, 1)
 (2, 3)
 (4, 1)
@@ -187,21 +157,29 @@ from aitool import get_functions, multi
 
 
 def toy(x, y=1):
-    sleep(random())
     return x, y
 
 
-condition = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
-functions = list(get_functions(toy, condition))
-for result in multi(functions):
+def bauble(x=1, y=2):
+    return x+y
+
+
+toy_functions = list(get_functions(toy, [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]))
+bauble_functions = list(get_functions(bauble, [None, -2, [-3], [6, -1], {'y': 4}]))
+for result in multi(toy_functions+bauble_functions):
     print(result)
 ```
 > 输出
 ```text
-(2, 3)
-(6, 7)
-(4, 1)
 (1, 1)
+(2, 3)
+(4, 1)
+(6, 7)
+3
+0
+-1
+5
+5
 ```
 
 

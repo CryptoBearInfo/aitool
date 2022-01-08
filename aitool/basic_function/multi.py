@@ -98,7 +98,8 @@ def get_functions(_func: Callable, /, _iter: Iterable) -> Iterable:
     依据一组参数和基础函数，生成一组对应的新函数。
     由于函数的参数结构是：*args, **keywords
     为了方便用户使用，将如下进行参数解析：
-    * 如果参数是不可迭代类型（例如string、int），就会被当做*args处理
+    * 如果参数是None，将视为不设置参数
+    * 如果参数是不可迭代类型，且不是None，就会被当做*args处理
     * 如果参数是dict类型，就会被当做**keywords处理
     * 如果参数是list类型，就会被当做*arg处理
     * 如果参数是长度为2的tuple类型，就会被当做(*args, **keywords)处理
@@ -109,7 +110,9 @@ def get_functions(_func: Callable, /, _iter: Iterable) -> Iterable:
     :return: 一组对应的新函数
     """
     for condition in _iter:
-        if not isinstance(condition, Iterable):
+        if condition is None:
+            yield _func
+        elif not isinstance(condition, Iterable):
             yield functools.partial(_func, condition)
         elif type(condition) == dict:
             yield functools.partial(_func, **condition)
@@ -165,9 +168,6 @@ def multi(
     """
     if processes < 1:
         raise ValueError('processes should bigger than 0')
-    print('ordered默认设置为True，保证按序输出结果。'
-          '有极小可能导致OutOfMemory报错，如果遇到请设置为ordered=False')
-    print('同时执行的进程数量上限：{}'.format(processes))
     begin_time = time()
 
     def print_error(value):
