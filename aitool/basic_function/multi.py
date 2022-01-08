@@ -22,12 +22,12 @@ from collections.abc import Iterable
 from os import cpu_count
 from random import random
 from time import sleep, time
-from typing import Iterator, Callable
+from typing import Iterator, Callable, NoReturn
 
 import multiprocess as mp
 
 
-def get_functions(_func: Callable, /, _iter: Iterable):
+def get_functions(_func: Callable, /, _iter: Iterable) -> Iterable:
     """
     依据一组参数和基础函数，生成一组对应的新函数。
     由于函数的参数结构是：*args, **keywords
@@ -69,7 +69,14 @@ def get_functions(_func: Callable, /, _iter: Iterable):
                 """)
 
 
-def _return_2_queue(function, index, queue):
+def _return_2_queue(function: Callable, index: int, queue) -> NoReturn:
+    """
+    对function做封装，将function的执行结果纯粹到管道queue里。
+    :param function: 被封装的函数
+    :param index: function的序号
+    :param queue: 管道，用于和父进程通信
+    :return:
+    """
     result = function()
     queue.put((index, result))
 
@@ -110,7 +117,7 @@ def multi(
     # 每time_step秒进行一次巡察
     while True:
         # TODO
-        # 有其他更好的监控方式吗？
+        # 有更好的方式监控queue并及时返回结果吗？
         # 目前用的yield很蠢，如果不及时消费，所有子进程都会阻塞
         # 想设计一个负责取值的子进程持续监控queue并传值给主进程，
         # 但是主进程的消费和取值的子进程好像可能导致读写冲突，不知道加个锁是否能解决这个问题，
@@ -128,7 +135,7 @@ def multi(
             ordered_requirement += 1
 
         # TODO
-        # 怎么在pool里判断所有进程都运行完了?
+        # 怎么判断pool里所有进程都运行完了?
         # 考虑过pool.join()，它是阻塞的不符合需求。
         # 目前的实现有提前终止的风险，
         # 目前的实现是：判断在pool里的processes个进程是否都结束了，如果都结束就终止，
@@ -145,7 +152,7 @@ def multi(
             break
 
     # TODO
-    # 不确定目前的逻辑是否会遗漏数据
+    # 不确定目前的逻辑是否会遗漏数据未返回
     if len(ordered_results):
         print('Warning: ordered_results 数据没有取完')
     if not queue.empty():

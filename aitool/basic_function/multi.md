@@ -1,23 +1,22 @@
 # 便捷地实现多进程
 
-假如有个需要多次调用的函数toy
+假如函数toy需要被多次调用：
 ```python
 def toy(x, y=1):
     sleep(random())
     return x, y
 ```
 
-我们也许是这样调用的：
+假设之前是这样调用的：
 ```python
-for i in range(10):
+for i in range(3):
     print(toy(i))
 ```
 
-
-现在可以这样将上述代码轻松改造为多进程执行：
+要改成多进程执行，只需要这么写。[可执行的完整示例](#multi通常用法)：
 ```python
 # 获取所有要执行的函数
-functions = get_functions(toy, range(10))
+functions = get_functions(toy, range(3))
 # 多进程执行
 for result in multi(functions):
     print(result)
@@ -40,6 +39,7 @@ pip install aitool
 
 ### multi基本用法
 - 由于是多进程，输出顺序不固定
+
 ```python
 from time import sleep
 from random import random
@@ -68,6 +68,7 @@ for result in multi([toy_1, toy_2]):
 ### multi按序输出
 - 如果需要输出保持原有顺序，只需要设置`ordered=True`。
 - 输出一定是按序的
+
 ```python
 from time import sleep
 from random import random
@@ -96,6 +97,7 @@ for result in multi([toy_1, toy_2], ordered=True):
 ### get_functions基本用法
 - 需要并发执行的往往是同一个函数，只不过参数不一样。  
 - get_functions可以基于参数列表生成函数列表。
+
 ```python
 from time import sleep
 from random import random
@@ -119,6 +121,7 @@ for function in get_functions(toy, range(3)):
 
 ### get_functions通常用法
 - 支持多种灵活的传参方式
+
 ```python
 from time import sleep
 from random import random
@@ -143,8 +146,9 @@ for function in get_functions(toy, condition):
 ```
 
 ### multi通常用法
-- 先用get_functions获取函数列表。  
-- 在用multi多进程执行。
+- 先用get_functions获取函数列表  
+- 再用multi多进程执行
+
 ```python
 from time import sleep
 from random import random
@@ -168,4 +172,3 @@ for result in multi(functions):
 (4, 1)
 (1, 1)
 ```
-
