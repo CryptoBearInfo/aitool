@@ -13,7 +13,7 @@ for i in range(3):
     print(toy(i))
 ```
 
-要改成多进程执行，只需要这么写。[按序执行、原生方法、multi方法的对比](#按序执行、原生方法、multi方法的对比)：
+要改成多进程执行，只需要这么写。[原生方法和multi方法的对比](#原生方法和multi方法的对比)：
 ```python
 # 获取所有要执行的函数
 functions = get_functions(toy, range(3))
@@ -31,7 +31,7 @@ for result in multi(functions):
 - [get_functions基本用法](#get_functions基本用法)
 - [get_functions通常用法](#get_functions通常用法)
 - [multi通常用法](#multi通常用法)
-- [按序执行、原生方法、multi方法的对比](#按序执行、原生方法、multi方法的对比)
+- [原生方法和multi方法的对比](#原生方法和multi方法的对比)
 
 ### 环境配置
 ```shell script
@@ -175,7 +175,7 @@ for result in multi(functions):
 ```
 
 
-### 按序执行、原生方法、multi方法的对比
+### 原生方法和multi方法的对比
 > 测试环境: 16核mac笔记本电脑, 可能会有一些误差
 > 需要先安装环境`pip install aitool`
 
