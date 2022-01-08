@@ -13,7 +13,7 @@ for i in range(3):
     print(toy(i))
 ```
 
-要改成多进程执行，只需要这么写。[可执行的完整示例](#multi通常用法)：
+要改成多进程执行，只需要这么写。[按序执行、原生方法、multi方法的对比](#按序执行、原生方法、multi方法的对比)：
 ```python
 # 获取所有要执行的函数
 functions = get_functions(toy, range(3))
@@ -31,6 +31,7 @@ for result in multi(functions):
 - [get_functions基本用法](#get_functions基本用法)
 - [get_functions通常用法](#get_functions通常用法)
 - [multi通常用法](#multi通常用法)
+- [按序执行、原生方法、multi方法的对比](#按序执行、原生方法、multi方法的对比)
 
 ### 环境配置
 ```shell script
@@ -171,4 +172,73 @@ for result in multi(functions):
 (6, 7)
 (4, 1)
 (1, 1)
+```
+
+
+### 按序执行、原生方法、multi方法的对比
+> 测试环境: 16核mac笔记本电脑, 可能会有一些误差
+> 需要先安装环境`pip install aitool`
+
+| 函数名 | 细节 | 改动量 | 耗时（秒） |
+| --- | --- | --- | --- |
+| test_sequence() | 按顺序执行多次toy函数 | - | 4981.669 |
+| test_use_pool() | 用multiprocess实现 | 需改写12行代码 | 420.896 |
+| test_use_multi() | 用multi实现 | 需改写2行代码 | 420.262 |
+| test_use_multi(ordered=True) | 用multi实现，并按序输出 | 需改写2行代码 | 419.933 |
+
+```python
+from os import cpu_count
+from random import random
+from time import sleep
+import multiprocess as mp
+from aitool import get_functions, multi, exe_time
+
+
+SLEEP_TIME = [random() for _ in range(10000)]
+
+
+def toy(x):
+    sleep(x)
+    return x
+
+
+def do_something_in_parent_process(data):
+    print(data)
+
+
+@exe_time(print_time=True)
+def test_sequence():
+    data = [toy(time) for time in SLEEP_TIME]
+    do_something_in_parent_process(data)
+
+
+@exe_time(print_time=True)
+def test_use_pool():
+    def toy_4_multiprocess(x, _queue):
+        sleep(random())
+        _queue.put(x)
+
+    queue = mp.Manager().Queue()
+    pool = mp.Pool(processes=cpu_count())
+    for time in SLEEP_TIME:
+        pool.apply_async(toy_4_multiprocess, args=(time, queue,))
+    pool.close()
+    pool.join()
+    data = []
+    while not queue.empty():
+        data.append(queue.get(False))
+    do_something_in_parent_process(data)
+
+
+@exe_time(print_time=True)
+def test_use_multi(ordered=False):
+    functions = list(get_functions(toy, SLEEP_TIME))
+    data = [result for result in multi(functions, ordered=ordered)]
+    do_something_in_parent_process(data)
+
+
+test_use_pool()
+test_use_multi()
+test_use_multi(ordered=True)
+test_sequence()
 ```
