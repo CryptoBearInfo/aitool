@@ -13,9 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-偶尔会需要把代码改为多进程。
-但每次改造都要费不少时间。
-于是想开发个工具，3分钟完成改造。
+共提供3种实现方式pool_map，pool_starmap，multi_map
+使用方法请参考：test_pool_map()，test_pool_starmap()，test_multi_map()
 """
 import functools
 from collections.abc import Iterable
@@ -25,6 +24,73 @@ from time import sleep, time
 from typing import Iterator, Callable, NoReturn
 
 import multiprocess as mp
+
+
+def pool_map(
+        func: Callable,
+        conditions: Iterable,
+        processes: int = cpu_count(),
+        initializer=None,
+        initargs=(),
+        maxtasksperchild=None,
+):
+    # 基于pool.map实现
+    with mp.Pool(
+            processes=processes,
+            initializer=initializer,
+            initargs=initargs,
+            maxtasksperchild=maxtasksperchild,
+    ) as p:
+        for result in p.map(func, conditions):
+            yield result
+
+
+def pool_starmap(
+        func: Callable,
+        conditions: Iterable,
+        processes: int = cpu_count(),
+        initializer=None,
+        initargs=(),
+        maxtasksperchild=None,
+):
+    # 基于pool.starmap实现
+    with mp.Pool(
+            processes=processes,
+            initializer=initializer,
+            initargs=initargs,
+            maxtasksperchild=maxtasksperchild,
+    ) as p:
+        for result in p.starmap(func, conditions):
+            yield result
+
+
+def multi_map(
+        func: Callable,
+        conditions: Iterable,
+        processes: int = cpu_count(),
+        time_step: float = 0.01,
+        ordered: bool = False,
+        timeout: float = None,
+) -> Iterable:
+    """
+    基于一组参数并行计算func
+    :param func: 函数
+    :param conditions: 一组参数
+    :param processes: 同时启动的进程数量上限，默认为cpu核数
+    :param time_step: 主进程每间隔time_step秒读取一次数据
+    :param ordered: 是否按functions的顺序输出结果。ordered=True时，各function会等待排它前面的所有function输出后才输出。
+    :param timeout: 最大运行时长，设置为None时表示不做时长限制
+    :return: functions里各个函数的返回结果
+    """
+    functions = list(get_functions(func, conditions))
+    for result in multi(
+            functions,
+            processes=processes,
+            time_step=time_step,
+            ordered=ordered,
+            timeout=timeout,
+    ):
+        yield result
 
 
 def get_functions(_func: Callable, /, _iter: Iterable) -> Iterable:
@@ -85,7 +151,7 @@ def multi(
         functions: Iterator[Callable],
         processes: int = cpu_count(),
         time_step: float = 0.01,
-        ordered: bool = False,
+        ordered: bool = True,
         timeout: float = None,
 ) -> Iterable:
     """
@@ -99,6 +165,9 @@ def multi(
     """
     if processes < 1:
         raise ValueError('processes should bigger than 0')
+    print('ordered默认设置为True，保证按序输出结果。'
+          '有极小可能导致OutOfMemory报错，如果遇到请设置为ordered=False')
+    print('同时执行的进程数量上限：{}'.format(processes))
     begin_time = time()
 
     def print_error(value):
@@ -229,11 +298,54 @@ def test_multi_common():
         print(result)
 
 
-if __name__ == '__main__':
-    """
-    具体使用请参考以下的4个test例子
-    """
+def test_sequence():
+    def toy(x, y=1):
+        return x, y
 
+    for result in map(toy, range(3)):
+        print(result)
+
+
+def test_pool_map():
+    print('test_pool_map')
+
+    def toy(x, y=1):
+        sleep(random())
+        return x, y
+
+    for result in pool_map(toy, range(3)):
+        print(result)
+
+
+def test_pool_starmap():
+    print('test_pool_starmap')
+
+    def toy(x, y=1):
+        sleep(random())
+        return x, y
+
+    for result in pool_starmap(toy, [[0, 1], [1, 1], [2, 1]]):
+        print(result)
+
+
+def test_multi_map():
+    print('test_multi_map')
+    def toy(x, y=1):
+        sleep(random())
+        return x, y
+
+    for result in multi_map(toy, range(3)):
+        print(result)
+
+
+if __name__ == '__main__':
+    # 核心测试样例
+    test_sequence()
+    test_pool_map()
+    test_pool_starmap()
+    test_multi_map()
+
+    # 其他次要的测试样例
     test_multi_base()
     test_multi_ordered()
     test_get_functions_base()
