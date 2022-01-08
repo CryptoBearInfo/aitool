@@ -1,14 +1,14 @@
 # multi
-- multi是对multiprocess的封装（没有使用multiprocessing，因为multiprocessing有[设计缺陷](https://bugs.python.org/issue25053)。
+- multi是对multiprocess的封装（没有使用multiprocessing，因为multiprocessing有[设计缺陷](https://bugs.python.org/issue25053)。）
 - 使用multi后**只需修改2行代码就可以将顺序执行改造为并行执行**。
 - multi封装了一些实用的功能，例如：按序输出、子进程报错信息打印。
 
 | 函数名 | 细节 | 代码修改量 | 耗时（秒） |
 | --- | --- | --- | --- |
 | test_sequence() | 将被改造成多进程执行的函数 | - | 4981.669 |
-| test_use_pool() | 用multiprocess改造 | 需修改12行 | 420.896 |
-| test_use_multi() | 用multi改造 | 需修改2行 | 420.262 |
-| test_use_multi(ordered=True) | 用multi实现，并按序输出 | 需修改2行 | 419.933 |
+| test_use_pool() | 用multiprocess改造 | 需修改**12行** | 420.896 |
+| test_use_multi() | 用multi改造 | 需修改**2行** | 420.262 |
+| test_use_multi(ordered=True) | 用multi改造，并按序输出 | 需修改**2行** | 419.933 |
 
 评测详情请参考：[原生方法和multi方法的对比](#原生方法和multi方法的对比)。
 

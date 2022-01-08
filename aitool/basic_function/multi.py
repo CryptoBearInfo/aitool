@@ -128,6 +128,9 @@ def multi(
             if not ordered:
                 yield _result
             else:
+                # TODO
+                # ordered=True 时会对返回值做存储，
+                # 在进程很多且运行时间很不均衡时，可能导致内存占用量不断增多，导致OutOfMemory
                 ordered_results[_index] = _result
 
         while ordered and ordered_requirement in ordered_results:
