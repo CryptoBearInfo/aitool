@@ -1,6 +1,8 @@
 # pool_map，pool_starmap，multi_map
 - **修改1行代码将顺序执行改造为并行执行**。
 - 三种方法都**按序输出**，多次运行获得的结果顺序是一致的。
+- 三种方法都基于multiprocess库，而非multiprocessing库。因为multiprocessing有[设计缺陷](https://bugs.python.org/issue25053)。）
+
 
 假如函数toy需要被多次调用：
 ```python
