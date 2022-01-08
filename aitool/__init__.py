@@ -54,6 +54,9 @@ from aitool.basic_function.cache import get_cache
 from aitool.basic_function.cache import Cache
 
 # 多进程
+from aitool.basic_function.multi import pool_map
+from aitool.basic_function.multi import pool_starmap
+from aitool.basic_function.multi import multi_map
 from aitool.basic_function.multi import get_functions
 from aitool.basic_function.multi import multi
 
