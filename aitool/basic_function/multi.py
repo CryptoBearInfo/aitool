@@ -69,7 +69,7 @@ def multi_map(
         conditions: Iterable,
         processes: int = cpu_count(),
         time_step: float = 0.01,
-        ordered: bool = False,
+        ordered: bool = True,
         timeout: float = None,
 ) -> Iterable:
     """
