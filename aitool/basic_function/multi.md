@@ -1,18 +1,6 @@
-# multi
-- multi是对multiprocess的封装（没有使用multiprocessing，因为multiprocessing有[设计缺陷](https://bugs.python.org/issue25053)。）
-- 使用multi后**只需修改2行代码就可以将顺序执行改造为并行执行**。
-- multi封装了一些实用的功能，例如：按序输出、子进程报错信息打印。
+# pool_map，pool_starmap，multi_map
+- **修改1行代码将顺序执行改造为并行执行**。
 
-| 函数名 | 细节 | 代码修改量 | 耗时（秒） |
-| --- | --- | --- | --- |
-| test_sequence() | 将被改造成多进程执行的函数 | - | 4981.669 |
-| test_use_pool() | 用multiprocess改造 | 需修改**12行** | 420.896 |
-| test_use_multi() | 用multi改造 | 需修改**2行** | 420.262 |
-| test_use_multi(ordered=True) | 用multi改造，并按序输出 | 需修改**2行** | 419.933 |
-
-评测详情请参考：[原生方法和multi方法的对比](#原生方法和multi方法的对比)。
-
-### 一个简单的例子
 假如函数toy需要被多次调用：
 ```python
 def toy(x, y=1):
@@ -20,33 +8,62 @@ def toy(x, y=1):
 ```
 顺序执行的写法：
 ```python
-for i in range(3):
-    print(toy(i))
-```
-并行执行的写法：
-```python
-# 获取所有要执行的函数
-functions = get_functions(toy, range(3))
-# 多进程执行
-for result in multi(functions):
+for result in map(toy, range(3)):
     print(result)
 ```
 
+并行执行的写法：
+```python
+# 提供3种实现方式：pool_map，pool_starmap，multi_map
+from aitool import pool_map, pool_starmap, multi_map
 
-### How To Use
+# 方法1：
+for result in pool_map(toy, range(3)):
+    print(result)
 
-- [环境配置](#环境配置)
+# 方法2：
+for result in pool_starmap(toy, [[0, 1], [1, 1], [2, 1]]):
+    print(result)
+
+# 方法3：
+for result in multi_map(toy, range(3)):
+    print(result)
+```
+
+### pool_map、pool_starmap、multi_map的对比
+- multi封装了一些实用的功能，例如：按序输出、子进程报错信息打印。
+
+| 函数名 | 实现方案 | 优点 | 缺点 | 耗时（秒） |
+| --- | --- | --- | --- |
+| test_sequence() | 按序循环执行 | - | - | 987.171 |
+| test_pool_map() | 封装pool.map | 稳定 | 输出顺序随机，参数不灵活 | 87.051 |
+| test_pool_starmap() | 封装pool.starmap | 输出顺序随机，参数不灵活 | | 87.047 |
+| test_multi_map() | 封装pool | **能按序输出**，参数灵活 | 还在开发，不稳定 | 83.348 |
+
+评测详情请参考：[pool_map和pool_starmap和multi_map的对比](#pool_map和pool_starmap和multi_map的对比)。
+
+### 环境配置
+```shell script
+pip install aitool --upgrade
+```
+
+### multi_map参数灵活
+```python
+def toy(x, y=1):
+    return x, y
+
+for result in multi_map(toy, [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]):
+    print(result)
+```
+
+### multi_map和multi和get_functions
+> multi_map基于multi和get_functions实现
+
 - [multi基本用法](#multi基本用法)
 - [multi按序输出](#multi按序输出)
 - [get_functions基本用法](#get_functions基本用法)
 - [get_functions通常用法](#get_functions通常用法)
 - [multi通常用法](#multi通常用法)
-- [原生方法和multi方法的对比](#原生方法和multi方法的对比)
-
-### 环境配置
-```shell script
-pip install aitool
-```
 
 ### multi基本用法
 - 由于是多进程，输出顺序不固定
@@ -185,26 +202,24 @@ for result in multi(functions):
 ```
 
 
-### 原生方法和multi方法的对比
-> 测试环境: 16核mac笔记本电脑, 可能会有一些误差
-> 需要先安装环境`pip install aitool`
+### pool_map和pool_starmap和multi_map的对比
+> 测试环境: 12核mac笔记本电脑, 可能会有一些误差
+> 需要先安装环境`pip install aitool --upgrade`
 
-| 函数名 | 细节 | 改动量 | 耗时（秒） |
+| 函数名 | 实现方案 | 优点 | 缺点 | 耗时（秒） |
 | --- | --- | --- | --- |
-| test_sequence() | 按顺序执行多次toy函数 | - | 4981.669 |
-| test_use_pool() | 用multiprocess实现 | 需改写12行代码 | 420.896 |
-| test_use_multi() | 用multi实现 | 需改写2行代码 | 420.262 |
-| test_use_multi(ordered=True) | 用multi实现，并按序输出 | 需改写2行代码 | 419.933 |
+| test_sequence() | 按序循环执行 | - | - | 987.171 |
+| test_pool_map() | 封装pool.map | 稳定 | 参数不灵活 | 87.051 |
+| test_pool_starmap() | 封装pool.starmap | 参数不灵活 | | 87.047 |
+| test_multi_map() | 封装pool | 能按序输出，参数灵活 | 还在开发，不稳定 | 83.348 |
 
 ```python
-from os import cpu_count
 from random import random
 from time import sleep
-import multiprocess as mp
-from aitool import get_functions, multi, exe_time
+from aitool import pool_map, pool_starmap, multi_map, exe_time
 
 
-SLEEP_TIME = [random() for _ in range(10000)]
+SLEEP_TIME = [random() for _ in range(2000)]
 
 
 def toy(x):
@@ -223,32 +238,27 @@ def test_sequence():
 
 
 @exe_time(print_time=True)
-def test_use_pool():
-    def toy_4_multiprocess(x, _queue):
-        sleep(random())
-        _queue.put(x)
-
-    queue = mp.Manager().Queue()
-    pool = mp.Pool(processes=cpu_count())
-    for time in SLEEP_TIME:
-        pool.apply_async(toy_4_multiprocess, args=(time, queue,))
-    pool.close()
-    pool.join()
-    data = []
-    while not queue.empty():
-        data.append(queue.get(False))
+def test_pool_map():
+    data = [result for result in pool_map(toy, SLEEP_TIME)]
     do_something_in_parent_process(data)
 
 
 @exe_time(print_time=True)
-def test_use_multi(ordered=False):
-    functions = list(get_functions(toy, SLEEP_TIME))
-    data = [result for result in multi(functions, ordered=ordered)]
+def test_pool_starmap():
+    data = [result for result in pool_starmap(toy, [[_] for _ in SLEEP_TIME])]
     do_something_in_parent_process(data)
 
 
-test_use_pool()
-test_use_multi()
-test_use_multi(ordered=True)
+@exe_time(print_time=True)
+def test_multi_map():
+    data = [result for result in multi_map(toy, SLEEP_TIME)]
+    do_something_in_parent_process(data)
+
+
+print(sum(SLEEP_TIME))
+test_pool_map()
+test_pool_starmap()
+test_multi_map()
 test_sequence()
+
 ```

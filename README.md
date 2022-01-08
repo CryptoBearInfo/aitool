@@ -30,7 +30,7 @@ aitool -
 
 ## Installation
 ```shell script
-pip install aitool
+pip install aitool --upgrade
 ```
 
 
