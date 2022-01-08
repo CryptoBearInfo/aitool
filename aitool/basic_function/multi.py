@@ -171,8 +171,8 @@ def test_get_functions_common():
         sleep(random())
         return x, y
 
-    data = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
-    for function in get_functions(toy, data):
+    condition = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
+    for function in get_functions(toy, condition):
         print(function())
 
 
@@ -215,8 +215,8 @@ def test_multi_common():
 
     condition = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
     functions = list(get_functions(toy, condition))
-    for function in multi(functions):
-        print(function)
+    for result in multi(functions):
+        print(result)
 
 
 if __name__ == '__main__':

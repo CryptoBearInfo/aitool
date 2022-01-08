@@ -130,8 +130,8 @@ def toy(x, y=1):
     return x, y
 
 
-data = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
-for function in get_functions(toy, data):
+condition = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
+for function in get_functions(toy, condition):
     print(function())
 ```
 > 输出
@@ -143,8 +143,8 @@ for function in get_functions(toy, data):
 ```
 
 ### multi通常用法
-- 需要并发执行的往往是同一个函数，只不过参数不一样。  
-- get_functions可以基于参数列表生成函数列表。
+- 先用get_functions获取函数列表。  
+- 在用multi多进程执行。
 ```python
 from time import sleep
 from random import random
@@ -158,8 +158,8 @@ def toy(x, y=1):
 
 condition = [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]
 functions = list(get_functions(toy, condition))
-for function in multi(functions):
-    print(function)
+for result in multi(functions):
+    print(result)
 ```
 > 输出
 ```text
