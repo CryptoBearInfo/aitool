@@ -43,6 +43,7 @@ from aitool.basic_function.format_data import html2text as html2text
 from aitool.basic_function.format_data import content2text as content2text
 from aitool.basic_function.format_data import split_part as split_part
 from aitool.basic_function.format_data import get_pair as get_pair
+from aitool.basic_function.format_data import np2list as np2list
 
 from aitool.basic_function.singleton import singleton as singleton
 from aitool.basic_function.exe_time import exe_time as exe_time

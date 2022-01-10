@@ -250,6 +250,21 @@ def get_pair(
     return pair
 
 
+def np2list(data):
+    """
+
+    :param data:
+    :return:
+
+    >>> data = np.array([[1, 2], [3, 4]])
+    >>> print(np2list(data))
+    [[1, 2], [3, 4]]
+    """
+    if data.ndim >= 1:
+        return [np2list(d) for d in data]
+    return data
+
+
 if __name__ == '__main__':
     import doctest
 
