@@ -100,10 +100,22 @@ def timeout(seconds: float, callback: Any):
     return timeout_func
 
 
-def timestamp():
-    describe = '{}'.format(time.asctime(time.localtime(time.time())))
-    describe = describe.replace('  ', '_')
-    describe = describe.replace(' ', '_')
+def timestamp(style=None):
+    _t = time.localtime(time.time())
+    if style == 'day':
+        describe = '{}_{}_{}'.format(_t.tm_year, _t.tm_mon, _t.tm_mday)
+    elif style == 'hour':
+        describe = '{}_{}_{}_{}'.format(_t.tm_year, _t.tm_mon, _t.tm_mday, _t.tm_hour)
+    elif style == 'min':
+        describe = '{}_{}_{}_{}:{}'.format(_t.tm_year, _t.tm_mon, _t.tm_mday, _t.tm_hour, _t.tm_min)
+    elif style == 'sec':
+        describe = '{}_{}_{}_{}:{}:{}'.format(_t.tm_year, _t.tm_mon, _t.tm_mday, _t.tm_hour, _t.tm_min, _t.tm_sec)
+    elif style is None:
+        describe = '{}'.format(time.asctime(_t))
+        describe = describe.replace('  ', '_')
+        describe = describe.replace(' ', '_')
+    else:
+        raise ValueError('style: {}'.format(style))
     return describe
 
 
@@ -119,4 +131,4 @@ if __name__ == '__main__':
     y = connect(2.5)
     print(y)
 
-    print(timestamp())
+    print(timestamp(style='sec'))
