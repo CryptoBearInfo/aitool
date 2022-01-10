@@ -17,7 +17,7 @@
 """
 import json
 from typing import Dict, Union, List, Any, NoReturn, Iterable, Tuple, Generator
-
+import numpy as np
 from bs4 import BeautifulSoup
 
 
@@ -260,8 +260,12 @@ def np2list(data):
     >>> print(np2list(data))
     [[1, 2], [3, 4]]
     """
-    if data.ndim >= 1:
-        return [np2list(d) for d in data]
+    _type = type(data)
+    if _type == np.ndarray:
+        if data.ndim >= 1:
+            return [np2list(d) for d in data]
+    if _type in [np.int0, np.int8, np.int16, np.int32, np.int64]:
+        return int(data)
     return data
 
 
