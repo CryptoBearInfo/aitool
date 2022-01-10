@@ -1,6 +1,6 @@
 # pool_map，pool_starmap，multi_map
-- **修改1行代码将顺序执行改造为并行执行**。
-- 三种方法都**按序输出**，多次运行获得的结果顺序是一致的。
+- 修改**1行**代码将顺序执行改造为并行执行。
+- 三种方法都**按序输出**，多次运行获得的结果**顺序是一致**的。
 - 三种方法都基于multiprocess库，而非multiprocessing库。因为multiprocessing有[设计缺陷](https://bugs.python.org/issue25053)。）
 
 
@@ -15,10 +15,10 @@ for result in map(toy, range(3)):
     print(result)
 ```
 
-并行执行的写法：
+**并行执行的3种写法**：
 ```python
 # 提供3种实现方式：pool_map，pool_starmap，multi_map
-# 3种方式的几乎等效的，在参数不复杂的情况下推荐使用pool_map
+# 3种方式是几乎等效的，在参数不复杂的情况下推荐使用pool_map
 from aitool import pool_map, pool_starmap, multi_map
 
 # 方法1：
@@ -36,12 +36,12 @@ for result in multi_map(toy, range(3)):
 
 ### pool_map、pool_starmap、multi_map的对比
 
-| 函数名 | 实现方案 | 优点 | 缺点 | 耗时（秒） |
+| 方法 | 实现方案 | 优点 | 缺点 | 耗时（秒） |
 | --- | --- | --- | --- |
-| test_sequence() | 按序循环执行 | - | - | 987.171 |
-| test_pool_map() | 封装pool.map | 稳定 | 参数不灵活 | 87.051 |
-| test_pool_starmap() | 封装pool.starmap | 稳定 | 参数不灵活 | 87.047 |
-| test_multi_map() | 封装pool.apply_async | 参数灵活 | 不稳定 | 83.348 |
+| - | 按序循环执行 | - | - | 987.171 |
+| pool_map | 封装pool.map | 稳定 | 参数不灵活 | 87.051 |
+| pool_starmap | 封装pool.starmap | 稳定 | 参数不灵活 | 87.047 |
+| multi_map | 封装pool.apply_async | 参数灵活 | 不稳定 | 83.348 |
 
 评测详情请参考：[pool_map和pool_starmap和multi_map的对比](#pool_map和pool_starmap和multi_map的对比)。
 
@@ -151,8 +151,6 @@ for function in get_functions(toy, condition):
 - 再用multi多进程执行
 
 ```python
-from time import sleep
-from random import random
 from aitool import get_functions, multi
 
 
