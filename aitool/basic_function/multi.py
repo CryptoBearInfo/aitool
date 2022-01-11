@@ -93,7 +93,7 @@ def multi_map(
         yield result
 
 
-def get_functions(_func: Callable, /, _iter: Iterable) -> Iterable:
+def get_functions(_func: Callable, _iter: Iterable) -> Iterable:
     """
     依据一组参数和基础函数，生成一组对应的新函数。
     由于函数的参数结构是：*args, **keywords
