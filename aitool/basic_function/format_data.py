@@ -112,7 +112,7 @@ def _get_kv_pair(
                                             do_eval=do_eval, key_eval=key_eval, key_skip=key_skip,
                                             separator_key=separator_key, separator_index=separator_index))
                 return kv_pair
-        except (TypeError, SyntaxError, NameError):
+        except (TypeError, SyntaxError, NameError, json.decoder.JSONDecodeError):
             pass
 
     if isinstance(data, dict):
