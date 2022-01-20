@@ -15,7 +15,7 @@
 """
 
 """
-from aitool import encrypt_md5
+from aitool.basic_function.security import encrypt_md5
 from typing import Dict, List, Iterator, Any, NoReturn
 
 

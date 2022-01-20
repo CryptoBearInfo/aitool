@@ -1,5 +1,5 @@
 #coding=utf-8
-from aitool import exe_time
+from aitool.basic_function.exe_time import exe_time
 import Levenshtein
 import sys
 sys.setrecursionlimit(100000)

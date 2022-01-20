@@ -15,7 +15,8 @@ import math
 import functools
 import zipfile
 from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
-from aitool import split_dict, Deduplication
+from aitool.basic_function.basic import split_dict
+from aitool.basic_function.deduplication import Deduplication
 
 
 def is_file(path: str) -> bool:

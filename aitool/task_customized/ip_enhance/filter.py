@@ -21,7 +21,7 @@ import logging
 import re
 from typing import Dict, Union, List, Any, NoReturn
 from aitool.datasets import PATH as DATA_PATH
-from aitool import is_file_exist, load_lines, prepare_data, load_json
+from aitool.basic_function.file import is_file_exist, load_lines, prepare_data, load_json
 
 
 chinese_family_name = set()

@@ -16,8 +16,7 @@
 
 """
 from typing import Dict, Tuple, Union, List, Iterator, Any, NoReturn
-from aitool import deduplicate
-
+from aitool.basic_function.deduplication import deduplicate
 
 def find_all_position(substr: str, text: str) -> List[Tuple[int, int]]:
     """
@@ -51,7 +50,7 @@ def token_hit(text: str, tokens: Iterator[str]) -> List[str]:
     :param tokens: 字符串的列表
     :return: 命中的字符串的列表
     >>> token_hit('1234567', ['1', '34', '9'])
-    ['34', '1']
+    ['1', '34']
     """
     hit_token = []
     tokens = deduplicate(tokens)
