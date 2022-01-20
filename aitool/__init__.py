@@ -8,10 +8,13 @@ from aitool.basic_function.basic import split_char
 from aitool.basic_function.basic import is_appear
 
 from aitool.basic_function.string import find_all_position
+from aitool.basic_function.string import get_ngram
+from aitool.basic_function.string import token_hit
 
 from aitool.basic_function.security import encrypt_md5
 
 from aitool.basic_function.deduplication import Deduplication
+from aitool.basic_function.deduplication import deduplicate
 
 from aitool.basic_function.file import file_exist as file_exist
 from aitool.basic_function.file import is_file_exist as is_file_exist
@@ -86,3 +89,5 @@ from aitool.task_customized.ip_enhance.filter import get_core_ip
 
 # NLP FUNCTION
 from aitool.nlp.basic.split_sentence import split_sentence
+
+from aitool.nlp.basic.conditional_probability import conditional_probability

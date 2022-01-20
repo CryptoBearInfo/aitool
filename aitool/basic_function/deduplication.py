@@ -16,7 +16,22 @@
 
 """
 from aitool import encrypt_md5
-from typing import Dict, Union, List, Any, NoReturn
+from typing import Dict, List, Iterator, Any, NoReturn
+
+
+def deduplicate(items: Iterator[Any]) -> List[Any]:
+    """
+    在不影响原顺序的情况下去重
+    >>> deduplicate([1,2,3,2,1])
+    [1, 2, 3]
+    """
+    cache = set()
+    item_ddp = []
+    for item in items:
+        if item not in cache:
+            cache.add(item)
+            item_ddp.append(item)
+    return item_ddp
 
 
 class Deduplication:
@@ -36,6 +51,18 @@ class Deduplication:
         self.data = set()
 
     def is_duplication(self, item: Any, update=True) -> bool:
+        """
+        判断item是否重复出现。默认使用md5压缩内存。
+        :param item:
+        :param update:
+        :return:
+        >>> deduplication = Deduplication()
+        >>> for data in [1,1,2]:
+        ...     deduplication.is_duplication(data)
+        False
+        True
+        False
+        """
         if not isinstance(item, str):
             item = '{}'.format(item)
         if self.use_md5:
@@ -49,6 +76,6 @@ class Deduplication:
 
 
 if __name__ == '__main__':
-    deduplication = Deduplication()
-    for k in [1,2,3,1,2,{1,2},{1,2},set('12'),set('12'),set('21'),set('21'),{1,4}]:
-        print(k, '{}'.format(k), deduplication.is_duplication(k))
+    import doctest
+
+    doctest.testmod()
