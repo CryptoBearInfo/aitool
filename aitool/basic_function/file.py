@@ -104,11 +104,20 @@ def add_python_path(
 ) -> None:
     """
     将某路径下的所有python文件的绝对路径加到python_path
+
+    用于处理ModuleNotFoundError问题
+    通常只需要在对应文件开头加上，然后直接应该需要的包，而无需在意其所在的文件路径
+    （需要确保项目里没有同名的python文件）
+    # _path为从当前文件到项目根目录的相对路径
+    >>> add_python_path('../', show=True)
+
     :param _path: 根路径
     :param show: 输出提示信息
     :return:
     """
     python_path = set()
+    if show:
+        print('DEAL PATH: ', os.path.abspath(_path))
     for abs_path in get_file(_path, absolute=True):
         if abs_path[-3:] == '.py':
             python_path.add(os.path.dirname(abs_path))
