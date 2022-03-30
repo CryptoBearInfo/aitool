@@ -2,6 +2,7 @@
 # @Time    : 2020/10/29
 # @Author  : xiangyuejia@qq.com
 import os
+import sys
 import json
 import fileinput
 import warnings
@@ -77,9 +78,11 @@ def file_exist(file: str) -> bool:
 def get_file(
         path: str,
         skip_hidden: bool = True,
-        skip_folder: bool = True,
+        skip_folder: bool = False,
+        absolute: bool = False,
 ) -> Iterator[str]:
     """
+    TODO skip_folder 没有实现
     遍历path下的所有文件（不包括文件夹）
     :param path: 待遍历的路径
     :return: 一个返回文件名的迭代器
@@ -89,7 +92,30 @@ def get_file(
             file_path = os.path.join(root, file)
             if skip_hidden and is_file_hidden(file_path):
                 continue
-            yield file_path
+            if absolute:
+                yield os.path.abspath(file_path)
+            else:
+                yield file_path
+
+
+def add_python_path(
+        _path: str,
+        show: bool = False,
+) -> None:
+    """
+    将某路径下的所有python文件的绝对路径加到python_path
+    :param _path: 根路径
+    :param show: 输出提示信息
+    :return:
+    """
+    python_path = set()
+    for abs_path in get_file(_path, absolute=True):
+        if abs_path[-3:] == '.py':
+            python_path.add(os.path.dirname(abs_path))
+    for pth in python_path:
+        sys.path.append(pth)
+        if show:
+            print('ADD PYTHON PATH: ', pth)
 
 
 def make_dir(file: str, is_dir=False) -> NoReturn:
@@ -301,6 +327,7 @@ def dump_panda(
         data: List[Any],
         file: str,
         file_format: str,
+        header: bool = False,
         dump_index: bool = False,
         format_postfix: bool = True,
         **kwargs,
@@ -320,6 +347,7 @@ def dump_panda(
         raise ValueError('The parameter `index` is for pd.DataFrame. '
                          'If want to set the `index` for panda.to_csv/excel please use `dump_index`')
     if file_format == 'excel':
+        print('WARNING: default set header=False')
         if len(data) < MAX_LENGTH_XLSX - 100:
             selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
             df = pd.DataFrame(data, **selected_kwargs)
@@ -362,7 +390,7 @@ def load_excel(*args, **kwargs) -> List:
 
 def load_csv(*args, **kwargs) -> List:
     df = pd.read_csv(*args, **kwargs)
-    data = df.values
+    data = df.values.tolist()
     return data
 
 
@@ -439,5 +467,6 @@ if __name__ == '__main__':
     # test_data = [[i] for i in range(26)]
     # test_file = 'test.xlsx'
     # dump_excel(test_data, test_file)
-    for text in load_big_data('A.log', separator=' '):
-        print(text)
+    # for text in load_big_data('A.log', separator=' '):
+    #     print(text)
+    add_python_path('../', show=True)

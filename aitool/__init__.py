@@ -22,6 +22,8 @@ from aitool.basic_function.file import is_file as is_file
 from aitool.basic_function.file import is_folder as is_folder
 from aitool.basic_function.file import is_file_hidden as is_file_hidden
 from aitool.basic_function.file import get_file as get_file
+from aitool.basic_function.file import add_python_path as add_python_path
+
 
 from aitool.basic_function.file import dump_json as dump_json
 from aitool.basic_function.file import load_json as load_json
