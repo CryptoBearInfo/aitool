@@ -15,6 +15,7 @@ from tqdm import tqdm
 import math
 import functools
 import zipfile
+import xlsxwriter
 from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.deduplication import Deduplication
@@ -336,7 +337,6 @@ def dump_panda(
         data: List[Any],
         file: str,
         file_format: str,
-        header: bool = False,
         dump_index: bool = False,
         format_postfix: bool = True,
         **kwargs,
@@ -357,11 +357,14 @@ def dump_panda(
                          'If want to set the `index` for panda.to_csv/excel please use `dump_index`')
     if file_format == 'excel':
         print('WARNING: default set header=False')
+        kwargs['header'] = False if 'header' not in kwargs else kwargs['header']
+
         if len(data) < MAX_LENGTH_XLSX - 100:
             selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
             df = pd.DataFrame(data, **selected_kwargs)
             selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
             selected_kwargs['index'] = dump_index
+            selected_kwargs['engine'] = 'xlsxwriter' if 'engine' not in selected_kwargs else selected_kwargs['engine']
             df.to_excel(file, **selected_kwargs)
         else:
             piece_num = 0
@@ -373,6 +376,8 @@ def dump_panda(
                 df = pd.DataFrame(piece_data, **selected_kwargs)
                 selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(df.to_csv).args)
                 selected_kwargs['index'] = dump_index
+                selected_kwargs['engine'] = 'xlsxwriter' if 'engine' not in selected_kwargs else selected_kwargs[
+                    'engine']
                 df.to_excel(piece_file, **selected_kwargs)
                 piece_num += 1
     if file_format == 'csv':
@@ -473,9 +478,9 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
 
 
 if __name__ == '__main__':
-    # test_data = [[i] for i in range(26)]
-    # test_file = 'test.xlsx'
-    # dump_excel(test_data, test_file)
+    test_data = [[i] for i in range(26)]
+    test_file = 'tmp.xlsx'
+    dump_excel(test_data, test_file)
     # for text in load_big_data('A.log', separator=' '):
     #     print(text)
-    add_python_path('../', show=True)
+    # add_python_path('../', show=True)
