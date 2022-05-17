@@ -7,6 +7,7 @@ import json
 import fileinput
 import warnings
 import pickle
+from collections import defaultdict
 import numpy as np
 import pandas as pd
 import inspect
@@ -101,6 +102,7 @@ def get_file(
 
 def add_python_path(
         _path: str,
+        recursive: bool = True,
         show: bool = False,
 ) -> None:
     """
@@ -113,15 +115,27 @@ def add_python_path(
     >>> add_python_path('../', show=True)
 
     :param _path: 根路径
+    :param recursive: 是否递归添加所有子路径
     :param show: 输出提示信息
     :return:
     """
     python_path = set()
     if show:
         print('DEAL PATH: ', os.path.abspath(_path))
-    for abs_path in get_file(_path, absolute=True):
-        if abs_path[-3:] == '.py':
-            python_path.add(os.path.dirname(abs_path))
+
+    if recursive:
+        name_single = defaultdict(list)
+        for abs_path in get_file(_path, absolute=True):
+            if abs_path[-3:] == '.py':
+                basename = os.path.basename(abs_path)
+                name_single[basename].append(abs_path)
+                python_path.add(os.path.dirname(abs_path))
+        for k in name_single.keys():
+            if len(name_single[k]) > 1:
+                print('WARNING: name {} presents multiple times {}'.format(k, name_single[k]))
+    else:
+        python_path.add(os.path.abspath(_path))
+
     for pth in python_path:
         sys.path.append(pth)
         if show:
@@ -358,6 +372,7 @@ def dump_panda(
     if file_format == 'excel':
         print('WARNING: default set header=False')
         kwargs['header'] = False if 'header' not in kwargs else kwargs['header']
+        kwargs['keep_default_na'] = False if 'keep_default_na' not in kwargs else kwargs['keep_default_na']  # no nan
 
         if len(data) < MAX_LENGTH_XLSX - 100:
             selected_kwargs, _ = split_dict(kwargs, inspect.getfullargspec(pd.DataFrame).args)
@@ -478,9 +493,9 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
 
 
 if __name__ == '__main__':
-    test_data = [[i] for i in range(26)]
-    test_file = 'tmp.xlsx'
-    dump_excel(test_data, test_file)
+    # test_data = [[i] for i in range(26)]
+    # test_file = 'tmp.xlsx'
+    # dump_excel(test_data, test_file)
     # for text in load_big_data('A.log', separator=' '):
     #     print(text)
-    # add_python_path('../', show=True)
+    add_python_path('../', recursive=False, show=True)
