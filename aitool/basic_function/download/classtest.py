@@ -3,7 +3,7 @@
 # @Author  : xiangyuejia@qq.com
 from typing import Any, Tuple
 
-from aitool.basic_function.download_data.utils import check_integrity, download_and_extract_archive
+from aitool.basic_function.download.utils import check_integrity, download_and_extract_archive
 
 
 class ClassTest1:
