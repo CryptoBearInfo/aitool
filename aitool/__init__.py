@@ -16,6 +16,8 @@ from aitool.basic_function.security import encrypt_md5
 from aitool.basic_function.deduplication import Deduplication
 from aitool.basic_function.deduplication import deduplicate
 
+from aitool.basic_function.path import get_user_root_path as get_user_root_path
+
 from aitool.basic_function.file import file_exist as file_exist
 from aitool.basic_function.file import is_file_exist as is_file_exist
 from aitool.basic_function.file import is_file as is_file
