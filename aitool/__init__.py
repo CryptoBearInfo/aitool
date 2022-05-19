@@ -20,6 +20,7 @@ from aitool.basic_function.file import file_exist as file_exist
 from aitool.basic_function.file import is_file_exist as is_file_exist
 from aitool.basic_function.file import is_file as is_file
 from aitool.basic_function.file import is_folder as is_folder
+from aitool.basic_function.file import make_dir as make_dir
 from aitool.basic_function.file import is_file_hidden as is_file_hidden
 from aitool.basic_function.file import get_file as get_file
 from aitool.basic_function.file import add_python_path as add_python_path
