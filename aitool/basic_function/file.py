@@ -340,7 +340,7 @@ def load_lines(
         print('dict格式用每行的第一个元素作为key, 其后的元素的列表作为value。'
               '如果一行中不包含多个元素会报错。'
               '如果有相同的第一个元素会发生覆盖。')
-        data = {item[0]: item[1:] for item in data}
+        data = {item[0]: item[1:] if len(item) > 2 else item[1] for item in data}
     return data
 
 
