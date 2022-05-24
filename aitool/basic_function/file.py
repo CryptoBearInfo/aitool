@@ -408,6 +408,7 @@ dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
 def load_excel(*args, **kwargs) -> List:
+    kwargs['engine'] = 'openpyxl' if 'engine' not in kwargs else kwargs['engine']
     data = np.array([])
     try:
         df = pd.read_excel(*args, **kwargs)
