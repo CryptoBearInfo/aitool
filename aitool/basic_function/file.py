@@ -320,7 +320,7 @@ def load_lines(
         separator_time: int = -1,
         form: str = None,
         deduplication: bool = False,
-) -> List[Any]:
+) -> Union[list, dict, set]:
     data = []
     cache = Deduplication()
     with open(file, 'r', encoding='utf8') as fin:
@@ -409,6 +409,8 @@ dump_excel = functools.partial(dump_panda, file_format='excel')
 
 def load_excel(*args, **kwargs) -> List:
     kwargs['engine'] = 'openpyxl' if 'engine' not in kwargs else kwargs['engine']
+    kwargs['keep_default_na'] = False if 'keep_default_na' not in kwargs else kwargs['keep_default_na']
+
     data = np.array([])
     try:
         df = pd.read_excel(*args, **kwargs)
