@@ -18,6 +18,7 @@ import functools
 import zipfile
 import xlsxwriter
 from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
+from numpy import ndarray
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.deduplication import Deduplication
 
@@ -407,7 +408,7 @@ dump_csv = functools.partial(dump_panda, file_format='csv')
 dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
-def load_excel(*args, **kwargs) -> List:
+def load_excel(to_list=False, *args, **kwargs) -> Union[ndarray, Any]:
     kwargs['engine'] = 'openpyxl' if 'engine' not in kwargs else kwargs['engine']
     kwargs['keep_default_na'] = False if 'keep_default_na' not in kwargs else kwargs['keep_default_na']
 
@@ -417,6 +418,8 @@ def load_excel(*args, **kwargs) -> List:
         data = df.values
     except ValueError as err:
         print(err)
+    if to_list:
+        return data.tolist()
     return data
 
 
