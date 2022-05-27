@@ -408,7 +408,7 @@ dump_csv = functools.partial(dump_panda, file_format='csv')
 dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
-def load_excel(to_list=False, *args, **kwargs) -> Union[ndarray, Any]:
+def load_excel(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
     kwargs['engine'] = 'openpyxl' if 'engine' not in kwargs else kwargs['engine']
     kwargs['keep_default_na'] = False if 'keep_default_na' not in kwargs else kwargs['keep_default_na']
 
