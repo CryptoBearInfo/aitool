@@ -423,9 +423,11 @@ def load_excel(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
     return data
 
 
-def load_csv(*args, **kwargs) -> List:
+def load_csv(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
     df = pd.read_csv(*args, **kwargs)
-    data = df.values.tolist()
+    data = df.values
+    if to_list:
+        return data.tolist()
     return data
 
 
