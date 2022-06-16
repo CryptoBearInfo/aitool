@@ -409,7 +409,11 @@ dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
 def load_excel(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
-    kwargs['engine'] = 'openpyxl' if 'engine' not in kwargs else kwargs['engine']
+    print(args[0])
+    if args[0][-4:] == '.xls':
+        kwargs['engine'] = 'xlrd' if 'engine' not in kwargs else kwargs['engine']
+    else:
+        kwargs['engine'] = 'openpyxl' if 'engine' not in kwargs else kwargs['engine']
     kwargs['keep_default_na'] = False if 'keep_default_na' not in kwargs else kwargs['keep_default_na']
 
     data = np.array([])
@@ -506,4 +510,6 @@ if __name__ == '__main__':
     # dump_excel(test_data, test_file)
     # for text in load_big_data('A.log', separator=' '):
     #     print(text)
-    add_python_path('../', recursive=False, show=True)
+    # add_python_path('../', recursive=False, show=True)
+    load_excel('a.xls')
+    
