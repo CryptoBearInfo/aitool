@@ -4,6 +4,7 @@ import Levenshtein
 import sys
 sys.setrecursionlimit(100000)
 
+
 class BkTree:
     # An implementation of a BKTree. This tree allows
     # operations such as insertion, building up the
@@ -46,7 +47,6 @@ class BkTree:
         else:
             self.insert(node[1][d], word, deep+1)
         return node
-
 
     def tester(self, testword, n):
         # This method performs the actual querying of the bk

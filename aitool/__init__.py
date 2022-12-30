@@ -48,6 +48,7 @@ from aitool.basic_function.download.download import download_file as download_ur
 from aitool.basic_function.file import zip as zip
 from aitool.basic_function.file import unzip as unzip
 from aitool.basic_function.file import prepare_data as prepare_data
+from aitool.basic_function.file import split_path as split_path
 
 from aitool.basic_function.format_data import flatten as flatten
 from aitool.basic_function.format_data import html2text as html2text

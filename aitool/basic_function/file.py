@@ -17,7 +17,7 @@ import math
 import functools
 import zipfile
 import xlsxwriter
-from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable
+from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable, Tuple
 from numpy import ndarray
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.deduplication import Deduplication
@@ -369,7 +369,8 @@ def dump_panda(
 
     if 'index' in kwargs and isinstance(kwargs['index'], bool):
         raise ValueError('The parameter `index` is for pd.DataFrame. '
-                         'If want to set the `index` for panda.to_csv/excel please use `dump_index`')
+                         'If want to set the `index` for panda.to_csv/excel please use `dump_index`'
+                         'If want to hide the header please use `heade=None`')
     if file_format == 'excel':
         print('WARNING: default set header=False')
         kwargs['header'] = False if 'header' not in kwargs else kwargs['header']
@@ -504,6 +505,12 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
         unzip(packed_file, directory)
 
 
+def split_path(file_path: str) -> tuple[str, str, Any, Any]:
+    dir_name, full_file_name = os.path.split(file_path)
+    file_name, file_ext = os.path.splitext(full_file_name)
+    return dir_name, full_file_name, file_name, file_ext
+
+
 if __name__ == '__main__':
     # test_data = [[i] for i in range(26)]
     # test_file = 'tmp.xlsx'
@@ -511,5 +518,5 @@ if __name__ == '__main__':
     # for text in load_big_data('A.log', separator=' '):
     #     print(text)
     # add_python_path('../', recursive=False, show=True)
-    load_excel('a.xls')
-    
+    # load_excel('a.xls')
+    print(split_path('./a/b.k.txt'))
