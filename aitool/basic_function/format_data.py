@@ -16,6 +16,7 @@
 
 """
 import json
+from collections import Counter
 from typing import Dict, Union, List, Any, NoReturn, Iterable, Tuple, Generator
 import numpy as np
 from bs4 import BeautifulSoup
@@ -267,6 +268,16 @@ def np2list(data):
     if _type in [np.int0, np.int8, np.int16, np.int32, np.int64]:
         return int(data)
     return data
+
+
+def count_list(items: List[Union[str, int, float, tuple]]) -> dict:
+    """
+    统计list中元素的数量
+    >>> data = [1,1,3,2,3,5]
+    >>> count_list(data)
+    Counter({1: 2, 3: 2, 2: 1, 5: 1})
+    """
+    return Counter(items)
 
 
 if __name__ == '__main__':
