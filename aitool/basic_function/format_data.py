@@ -20,7 +20,7 @@ from collections import Counter
 from typing import Dict, Union, List, Any, NoReturn, Iterable, Tuple, Generator
 import numpy as np
 from bs4 import BeautifulSoup
-from aitool import is_all_chinese
+from aitool.task_customized.ip_enhance.filter import is_all_chinese
 
 
 def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, bytes)) -> Generator:
