@@ -107,7 +107,7 @@ def get_keyword_graph(texts: List[str]) -> Tuple[List, List, Any]:
         # 出现次数
         keypair2times[kp] = len(keypair2distance[kp])
         # 平均距离
-        keypair2distance_average = sum(keypair2distance[kp])/keypair2times[kp]
+        keypair2distance_average[kp] = sum(keypair2distance[kp])/keypair2times[kp]
         # 最频繁段短语
         keypair2best_fragment[kp] = get_most_item(keypair2fragment[kp], all_chinese=True)
         # 情感倾向
