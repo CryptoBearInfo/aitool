@@ -22,6 +22,7 @@ import jieba.analyse
 from typing import Dict, Union, List, Any, NoReturn, Tuple
 from aitool import DATAPATH, is_all_chinese, get_most_item
 from aitool.nlp.sentiment_analysis.dict_match import Sentiment
+from random import random
 
 
 def get_keyword(text, method='idf') -> dict:
@@ -97,7 +98,7 @@ def get_keyword_graph(texts: List[str]) -> Tuple[List, List, Any]:
             if len(keypair2sentence[kp]) < 5:
                 keypair2sentence[kp].append(sentence)
             keypair_score_sum[kp] = keyword2score[sp_pos_select[i][0]] + keyword2score[sp_pos_select[i + 1][0]]
-    # 对keypair做筛选
+    # keypair算特征
     keypair2times = {}
     keypair2distance_average = {}
     keypair2best_fragment = {}
@@ -119,11 +120,43 @@ def get_keyword_graph(texts: List[str]) -> Tuple[List, List, Any]:
             keypair2sentiment_negative[kp] += 1
         keypair2sentiment[kp] = abs(stm.score(id2keyword[keypair2id[kp][0]])) + \
                                 abs(stm.score(id2keyword[keypair2id[kp][1]]))
-    output = []
+    # 对特征汇总并计算排序分
+    all_feature = []
+    keypair2rank_score = {}
     for kp in keypair2id.keys():
-        output.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp], keypair2distance_average[kp],
-                       keypair2best_fragment[kp], keypair2sentiment[kp], keypair2sentiment_negative[kp]])
-    return output
+        keypair2rank_score[kp] = 0
+        keypair2rank_score[kp] += keypair_score_sum[kp]
+        if keypair2times[kp] > 100:
+            keypair2rank_score[kp] += 0.8
+        elif keypair2times[kp] > 10:
+            keypair2rank_score[kp] += 0.3
+        keypair2rank_score[kp] += keypair2sentiment_negative[kp]
+        keypair2rank_score[kp] += (keypair2sentiment_negative[kp]-keypair2sentiment[kp]) * 0.1
+        all_feature.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp],
+                            keypair2distance_average[kp], keypair2best_fragment[kp], keypair2sentiment[kp],
+                            keypair2sentiment_negative[kp], keypair2rank_score[kp]])
+    # 筛选出没有显著重复的词
+    all_feature.sort(key=lambda _: _[-1], reverse=True)
+    keypair_selected = []
+    char_selected = set()
+    for kpl in all_feature:
+        kp = kpl[0]
+        _char = set(keypair2best_fragment[kp])
+        if len(_char - char_selected) >= 2:
+            keypair_selected.append(kp)
+            char_selected |= _char
+    # 整理出node表
+    node = []
+    for kp in keypair_selected:
+        node.append([keypair2best_fragment[kp], keypair2rank_score[kp], keypair2sentence[kp]])
+    # 构建虚假的边集和
+    relation = []
+    len_node = len(node)
+    for i in range(len_node):
+        for j in range(i+1, len_node):
+            if random() < 1/(j-i+1):
+                relation.append([node[i][0], node[j][0], node[i][1]+node[j][1]])
+    return all_feature, node, relation
 
 
 if __name__ == '__main__':
