@@ -20,7 +20,8 @@ from tqdm import tqdm
 from collections import defaultdict, Counter
 import jieba.analyse
 from typing import Dict, Union, List, Any, NoReturn, Tuple
-from aitool import DATAPATH, is_all_chinese, get_most_item, Sentiment
+from aitool import DATAPATH, is_all_chinese, get_most_item
+from aitool.nlp.sentiment_analysis.dict_match import Sentiment
 
 
 def get_keyword(text, method='idf') -> dict:
