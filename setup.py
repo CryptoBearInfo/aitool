@@ -32,6 +32,9 @@ setup(
   long_description_content_type='text/markdown',
   url='https://github.com/deepgameai/aitool.git',
   packages=find_packages(),
+  package_data={
+      'aitool.datasets': ['stopwords.txt', 'negative.txt', 'positive.txt'],
+  },
   classifiers=[
       'Programming Language :: Python :: 3',
       'License :: OSI Approved :: MIT License',

@@ -8,3 +8,5 @@ xlrd
 openpyxl
 multiprocess
 xlsxwriter
+jieba
+snownlp

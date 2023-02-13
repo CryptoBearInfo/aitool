@@ -20,6 +20,7 @@ from collections import Counter
 from typing import Dict, Union, List, Any, NoReturn, Iterable, Tuple, Generator
 import numpy as np
 from bs4 import BeautifulSoup
+from aitool import is_all_chinese
 
 
 def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, bytes)) -> Generator:
@@ -270,15 +271,34 @@ def np2list(data):
     return data
 
 
-def count_list(items: List[Union[str, int, float, tuple]]) -> dict:
+def get_most_item(items: List[str], short=True, all_chinese=False) -> str:
     """
-    统计list中元素的数量
-    >>> data = [1,1,3,2,3,5]
-    >>> count_list(data)
-    Counter({1: 2, 3: 2, 2: 1, 5: 1})
+    选出出现次数最高的字符串。
+    short=True: 出现次数相同时，选长度最短的
+    short=False: 出现次数相同时，选长度最长的
+    >>> data = ['aa','a','aa','a','ab',]
+    >>> get_most_item(data)
+    'a'
+    >>> data = ['aa','a','aa','a','ab',]
+    >>> get_most_item(data, short=False)
+    'aa'
     """
-    return Counter(items)
-
+    text = ''
+    cnt = 0
+    for k, c in Counter(items).items():
+        if all_chinese and not is_all_chinese(k):
+            continue
+        if c > cnt:
+            text = k
+            cnt = c
+        elif c == cnt:
+            if short and len(k) < len(text):
+                text = k
+                cnt = c
+            if not short and len(k) > len(text):
+                text = k
+                cnt = c
+    return text
 
 if __name__ == '__main__':
     import doctest

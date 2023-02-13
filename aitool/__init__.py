@@ -56,7 +56,7 @@ from aitool.basic_function.format_data import content2text as content2text
 from aitool.basic_function.format_data import split_part as split_part
 from aitool.basic_function.format_data import get_pair as get_pair
 from aitool.basic_function.format_data import np2list as np2list
-from aitool.basic_function.format_data import count_list as count_list
+from aitool.basic_function.format_data import get_most_item as get_most_item
 
 from aitool.basic_function.singleton import singleton as singleton
 from aitool.basic_function.exe_time import exe_time as exe_time
@@ -99,5 +99,6 @@ from aitool.task_customized.ip_enhance.filter import get_core_ip
 
 # NLP FUNCTION
 from aitool.nlp.basic.split_sentence import split_sentence
+from aitool.nlp.sentiment_analysis.dict_match import Sentiment
 
 from aitool.nlp.basic.conditional_probability import conditional_probability
