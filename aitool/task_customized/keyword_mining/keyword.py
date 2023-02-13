@@ -102,6 +102,7 @@ def get_keyword_graph(texts: List[str]) -> Tuple[List, List, Any]:
     keypair2distance_average = {}
     keypair2best_fragment = {}
     keypair2sentiment = {}
+    keypair2sentiment_negative = {}
     stm = Sentiment()
     for kp, (id1, id2) in tqdm(keypair2id.items(), 'analysis keypair'):
         # 出现次数
@@ -111,8 +112,26 @@ def get_keyword_graph(texts: List[str]) -> Tuple[List, List, Any]:
         # 最频繁段短语
         keypair2best_fragment[kp] = get_most_item(keypair2fragment[kp], all_chinese=True)
         # 情感倾向
-        keypair2sentiment[kp] = abs(stm.score(id2keyword[keypair2id[kp][0]])) + abs(stm.score(id2keyword[keypair2id[kp][1]]))
+        keypair2sentiment_negative[kp] = 0
+        if stm.score(id2keyword[keypair2id[kp][0]]) == -1:
+            keypair2sentiment_negative[kp] += 1
+        if stm.score(id2keyword[keypair2id[kp][1]]) == -1:
+            keypair2sentiment_negative[kp] += 1
+        keypair2sentiment[kp] = abs(stm.score(id2keyword[keypair2id[kp][0]])) + \
+                                abs(stm.score(id2keyword[keypair2id[kp][1]]))
     output = []
     for kp in keypair2id.keys():
-        output.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp], keypair2distance_average[kp], keypair2best_fragment[kp], keypair2sentiment[kp]])
+        output.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp], keypair2distance_average[kp],
+                       keypair2best_fragment[kp], keypair2sentiment[kp], keypair2sentiment_negative[kp]])
     return output
+
+
+if __name__ == '__main__':
+    data = [
+        '纨绔的游戏，不知道正义能不能到来',
+        '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
+        '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
+        '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
+    ]
+    rst = get_keyword_graph(data)
+    print(rst)
