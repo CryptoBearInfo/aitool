@@ -505,7 +505,7 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
         unzip(packed_file, directory)
 
 
-def split_path(file_path: str) -> tuple[str, str, Any, Any]:
+def split_path(file_path: str) -> Tuple[str, str, Any, Any]:
     dir_name, full_file_name = os.path.split(file_path)
     file_name, file_ext = os.path.splitext(full_file_name)
     return dir_name, full_file_name, file_name, file_ext
