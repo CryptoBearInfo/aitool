@@ -97,6 +97,7 @@ from aitool.task_customized.ip_enhance.filter import select_nested_text
 from aitool.task_customized.ip_enhance.filter import is_sub_ip
 from aitool.task_customized.ip_enhance.filter import get_core_ip
 from aitool.task_customized.keyword_mining.keyword import get_keyword_graph
+from aitool.task_customized.keyword_mining.keyword import get_keyword_graph4panda
 from aitool.task_customized.keyword_mining.keyword import get_keyword
 from aitool.task_customized.keyword_mining.keyword import SentenceKeyword
 

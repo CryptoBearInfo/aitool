@@ -20,7 +20,7 @@ from tqdm import tqdm
 from collections import defaultdict, Counter
 import jieba.analyse
 from typing import Dict, Union, List, Any, NoReturn, Tuple
-from aitool import DATAPATH, is_all_chinese, get_most_item, load_lines, dump_pickle, load_pickle, exe_time
+from aitool import DATAPATH, is_all_chinese, get_most_item, load_lines, dump_pickle, load_pickle, exe_time, load_excel, np2list
 from aitool.basic_function.basic import split_punctuation
 from aitool.nlp.sentiment_analysis.dict_match import Sentiment
 from random import random
@@ -57,14 +57,14 @@ def get_keyword_graph(texts: List[str], top=10000, pos=('ns', 'n', 'vn', 'v'), n
     :param new: 新颖性得分权重
     :return: 节点表，边表，附加信息
     """
-    deny_word_set = set(load_lines(path.join(DATAPATH, 'stopwords.txt')))
+    deny_word_set = set(load_lines(path.join(DATAPATH, 'deny.txt')))
     concat_text = '\n'.join(texts)
     print('sentence:', len(texts), 'char', len(concat_text))
     keyword2score = get_keyword(concat_text, top=top, pos=pos)
     # 构建keyword2id，和用于记录keyword间共现关系的二维数组keyword_relation
     keyword_list = list(keyword2score.keys())
     # 额外添加否定词
-    keyword_set = set(keyword_list) & deny_word_set
+    keyword_set = set(keyword_list) | deny_word_set
     keyword_len = len(keyword_set)
     keyword2id = {}
     id2keyword = {}
@@ -111,7 +111,7 @@ def get_keyword_graph(texts: List[str], top=10000, pos=('ns', 'n', 'vn', 'v'), n
             keypair2distance[kp].append(kp_distance)
             keypair2id[kp] = (keyword2id[sp_pos_select[i][0]], keyword2id[sp_pos_select[i + 1][0]])
             keypair2fragment[kp].append(fragment)
-            if len(keypair2sentence[kp]) < 5:
+            if len(keypair2sentence[kp]) < 10:
                 keypair2sentence[kp].append(sentence)
             keypair_score_sum[kp] = keyword2score[sp_pos_select[i][0]] + keyword2score[sp_pos_select[i + 1][0]]
     # keypair算特征
@@ -245,19 +245,38 @@ class SentenceKeyword:
         return [split_punctuation(sentence)[-1]]
 
 
+def get_keyword_graph4panda(info):
+    # info 的格式为comment_id	group_id	text
+    info_list = np2list(info)
+    texts = []
+    text2info = {}
+    for comment_id, group_id, text in info_list:
+        texts.append(text)
+        text2info[text] = (comment_id, group_id)
+    rst, node, rel = get_keyword_graph(texts)
+    node_detail = []
+    for kp, score, sents in node:
+        detail = []
+        for sent in sents:
+            if sent in text2info:
+                detail.append({'text': sent, 'comment_id':text2info[sent][0], 'group_id':text2info[sent][1]})
+        node_detail.append([kp, score, detail])
+    return node_detail, rel
+
+
 if __name__ == '__main__':
-    data = [
-        '纨绔的游戏，不知道正义能不能到来',
-        '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
-        '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
-        '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
-        '不是有意违规',
-        '怎么就违规了'
-    ]
-    xx = SentenceKeyword()
-    for s in data:
-        print(s)
-        print(xx.get_sentence_keyword(s))
+    # data = [
+    #     '纨绔的游戏，不知道正义能不能到来',
+    #     '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
+    #     '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
+    #     '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
+    #     '不是有意违规',
+    #     '怎么就违规了'
+    # ]
+    # xx = SentenceKeyword()
+    # for s in data:
+    #     print(s)
+    #     print(xx.get_sentence_keyword(s))
 
     # all_feature, node, relation = get_keyword_graph(data)
     # print(node)
@@ -265,3 +284,5 @@ if __name__ == '__main__':
 
     # SentenceKeyword.update_keyword('/Users/bytedance/Downloads/281474998307169-point_extend-拉取大量标题-查询4.csv')
 
+    data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
+    print(get_keyword_graph4panda(data))
