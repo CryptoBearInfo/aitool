@@ -36,6 +36,12 @@ def split_char(chars, text):
     return re.split(chars, text)
 
 
+def split_punctuation(text):
+    # chars = ',.;`\[\]<>\?:"\{\}\~!@#\$%\^&\(\)-=\_\+，。、；‘’【】·！ …（）'
+    chars = ',.;?:!@#，。、；！'
+    return [_ for _ in split_char(chars, text) if len(_) > 0]
+
+
 class ReplaceChar:
     # 将text中的old字符（可以有多个）替换为new字符（只能有一个）
     # 实验发现用replace_build_in速度最快
@@ -103,4 +109,5 @@ def is_appear(text: str, traits: List[str]) -> bool:
 
 
 if __name__ == '__main__':
-    ReplaceChar.evaluate()
+    # ReplaceChar.evaluate()
+    print(split_punctuation('2月8日，《狂飙》黄瑶饰演者#程金铭发长文谈黄瑶对高启强的感情  ：她从未被生父抛弃，高启强害她家破人亡，偶尔的温情让黄瑶恍惚，但做错事要去该去的地方。'))

@@ -33,7 +33,7 @@ setup(
   url='https://github.com/deepgameai/aitool.git',
   packages=find_packages(),
   package_data={
-      'aitool.datasets': ['stopwords.txt', 'negative.txt', 'positive.txt'],
+      'aitool.datasets': ['stopwords.txt', 'negative.txt', 'positive.txt', 'keyword.pkl', 'deny.txt'],
   },
   classifiers=[
       'Programming Language :: Python :: 3',
