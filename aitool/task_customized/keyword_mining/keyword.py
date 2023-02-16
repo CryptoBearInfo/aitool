@@ -48,19 +48,31 @@ def get_keyword(text, method='idf', top=10000, pos=('ns', 'n', 'vn', 'v')) -> di
     return keyword2score
 
 
-def get_keyword_graph(texts: List[str], top=10000, pos=('ns', 'n', 'vn', 'v'), new=1.0) -> Tuple[List, List, Any]:
+def get_keyword_graph(
+        texts: List[str],
+        top=10000,
+        pos=('ns', 'n', 'vn', 'v'),
+        new=1.0,
+        default_keyword=False,
+) -> Tuple[List, List, Any]:
     """
     输入一组文本。提取关键词和边。
     :param texts: 一组文本
     :param top:
     :param pos:
     :param new: 新颖性得分权重
+    :param default_keyword:
     :return: 节点表，边表，附加信息
     """
     deny_word_set = set(load_lines(path.join(DATAPATH, 'deny.txt')))
-    concat_text = '\n'.join(texts)
-    print('sentence:', len(texts), 'char', len(concat_text))
-    keyword2score = get_keyword(concat_text, top=top, pos=pos)
+    if default_keyword:
+        # 使用预先计算好的keyword（从1000万个视频标题文本计算得到）
+        keyword2score = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
+    else:
+        # 不使用预先计算好的keyword
+        concat_text = '\n'.join(texts)
+        print('sentence:', len(texts), 'char', len(concat_text))
+        keyword2score = get_keyword(concat_text, top=top, pos=pos)
     # 构建keyword2id，和用于记录keyword间共现关系的二维数组keyword_relation
     keyword_list = list(keyword2score.keys())
     # 额外添加否定词
@@ -245,7 +257,7 @@ class SentenceKeyword:
         return [split_punctuation(sentence)[-1]]
 
 
-def get_keyword_graph4panda(info):
+def get_keyword_graph4panda(info, **kwargs):
     # info 的格式为comment_id	group_id	text
     info_list = np2list(info)
     texts = []
@@ -253,7 +265,7 @@ def get_keyword_graph4panda(info):
     for comment_id, group_id, text in info_list:
         texts.append(text)
         text2info[text] = (comment_id, group_id)
-    rst, node, rel = get_keyword_graph(texts)
+    rst, node, rel = get_keyword_graph(texts, **kwargs)
     node_detail = []
     for kp, score, sents in node:
         detail = []
@@ -285,4 +297,5 @@ if __name__ == '__main__':
     # SentenceKeyword.update_keyword('/Users/bytedance/Downloads/281474998307169-point_extend-拉取大量标题-查询4.csv')
 
     data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
-    print(get_keyword_graph4panda(data))
+    # print(get_keyword_graph4panda(data))
+    print(get_keyword_graph4panda(data, default_keyword=True))
