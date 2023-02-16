@@ -48,6 +48,12 @@ def get_keyword(text, method='idf', top=10000, pos=('ns', 'n', 'vn', 'v')) -> di
     return keyword2score
 
 
+def get_fragment():
+    # 候选考虑将此模块独立
+    # 支持不同的拼接方案：相邻的词、隔1个的词
+    pass
+
+
 def get_keyword_graph(
         texts: List[str],
         top=10000,
@@ -64,7 +70,6 @@ def get_keyword_graph(
     :param default_keyword:
     :return: 节点表，边表，附加信息
     """
-    deny_word_set = set(load_lines(path.join(DATAPATH, 'deny.txt')))
     if default_keyword:
         # 使用预先计算好的keyword（从1000万个视频标题文本计算得到）
         keyword2score = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
@@ -73,14 +78,17 @@ def get_keyword_graph(
         concat_text = '\n'.join(texts)
         print('sentence:', len(texts), 'char', len(concat_text))
         keyword2score = get_keyword(concat_text, top=top, pos=pos)
-    # 构建keyword2id，和用于记录keyword间共现关系的二维数组keyword_relation
-    keyword_list = list(keyword2score.keys())
+    # 导入否定词,并给定一个固定的分数
+    deny_word_set = set(load_lines(path.join(DATAPATH, 'deny.txt')))
+    for word in deny_word_set:
+        if word not in keyword2score:
+            keyword2score[word] = 0.1
     # 额外添加否定词
-    keyword_set = set(keyword_list) | deny_word_set
+    keyword_set = set(list(keyword2score.keys())) | deny_word_set
     keyword_len = len(keyword_set)
     keyword2id = {}
     id2keyword = {}
-    for _id, _k in enumerate(keyword_list):
+    for _id, _k in enumerate(keyword_set):
         keyword2id[_k] = _id
         id2keyword[_id] = _k
     keyword_relation = [[0] * keyword_len for _ in range(keyword_len)]
