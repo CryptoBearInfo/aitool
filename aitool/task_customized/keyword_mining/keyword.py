@@ -237,7 +237,13 @@ class SentenceKeyword:
         keyword2score = get_keyword(concat_text, top=top)
         dump_pickle(keyword2score, path.join(DATAPATH, 'keyword.pkl'))
 
-    def get_sentence_keyword(self, sentence):
+    def get_sentence_keyword(self, sentence, use_label=False):
+        # 取标签
+        label = []
+        label_text = sentence.split('#', 1)
+        if len(label_text) >= 2:
+            label = label_text[1].split('#')
+        # 提取fragment
         sp = list(self.tfidf.tokenizer.cut(sentence))
         sp_pos = [[sp[i], len(''.join(sp[:i]))] for i in range(len(sp))]
         sp_word = set(sp)
@@ -253,14 +259,11 @@ class SentenceKeyword:
             if len(fragment) >= 10:
                 continue
             rst.append(fragment)
+        if use_label:
+            rst = list(set(rst.extend([_ for _ in label if len(_)>3])))
         if rst:
             return rst
         # 挖掘结果为空时兜底策略
-        # 取标签
-        label = []
-        label_text = sentence.split('#', 1)
-        if len(label_text) >= 2:
-            label = label_text[1].split('#')
         if label:
             return label
         # 取短词
@@ -294,25 +297,25 @@ def get_keyword_graph4panda(info, **kwargs):
 
 
 if __name__ == '__main__':
-    # data = [
-    #     '纨绔的游戏，不知道正义能不能到来',
-    #     '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
-    #     '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
-    #     '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
-    #     '不是有意违规',
-    #     '怎么就违规了'
-    # ]
+    data = [
+        '纨绔的游戏，不知道正义能不能到来',
+        '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
+        '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
+        '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
+        '不是有意违规',
+        '怎么就违规了'
+    ]
     # xx = SentenceKeyword()
     # for s in data:
     #     print(s)
     #     print(xx.get_sentence_keyword(s))
 
-    # all_feature, node, relation = get_keyword_graph(data)
-    # print(node)
-    # print(all_feature, node, relation)
+    all_feature, node, relation = get_keyword_graph(data)
+    print(node)
+    print(relation)
 
     # SentenceKeyword.update_keyword('/Users/bytedance/Downloads/281474998307169-point_extend-拉取大量标题-查询4.csv')
 
-    data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
+    # data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
     # print(get_keyword_graph4panda(data))
-    print(get_keyword_graph4panda(data, default_keyword=True))
+    # print(get_keyword_graph4panda(data, default_keyword=True))
