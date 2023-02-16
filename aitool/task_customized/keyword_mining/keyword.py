@@ -54,12 +54,15 @@ def get_fragment():
     pass
 
 
+@exe_time(print_time=True)
 def get_keyword_graph(
         texts: List[str],
         top=10000,
         pos=('ns', 'n', 'vn', 'v'),
         new=1.0,
         default_keyword=False,
+        deny_word=True,
+        fix_deny_fragment=True,
 ) -> Tuple[List, List, Any]:
     """
     输入一组文本。提取关键词和边。
@@ -78,13 +81,14 @@ def get_keyword_graph(
         concat_text = '\n'.join(texts)
         print('sentence:', len(texts), 'char', len(concat_text))
         keyword2score = get_keyword(concat_text, top=top, pos=pos)
+    keyword_set = set(list(keyword2score.keys()))
     # 导入否定词,并给定一个固定的分数
     deny_word_set = set(load_lines(path.join(DATAPATH, 'deny.txt')))
-    for word in deny_word_set:
-        if word not in keyword2score:
-            keyword2score[word] = 0.1
-    # 额外添加否定词
-    keyword_set = set(list(keyword2score.keys())) | deny_word_set
+    if deny_word:
+        for word in deny_word_set:
+            if word not in keyword2score:
+                keyword2score[word] = 0.1
+        keyword_set = keyword_set | deny_word_set
     keyword_len = len(keyword_set)
     keyword2id = {}
     id2keyword = {}
@@ -117,12 +121,13 @@ def get_keyword_graph(
                 continue
             fragment = sentence[sp_pos_select[i][1]:sp_pos_select[i + 1][1] + len(sp_pos_select[i + 1][0])]
             # 检查fragment前的否定词,仅考虑最多3个词
-            if sentence[max(sp_pos_select[i][1]-3, 0):sp_pos_select[i][1]] in deny_word_set:
-                fragment = sentence[max(sp_pos_select[i][1]-3, 0):sp_pos_select[i][1]] + fragment
-            elif sentence[max(sp_pos_select[i][1]-2, 0):sp_pos_select[i][1]] in deny_word_set:
-                fragment = sentence[max(sp_pos_select[i][1]-2, 0):sp_pos_select[i][1]] + fragment
-            elif sentence[max(sp_pos_select[i][1]-1, 0):sp_pos_select[i][1]] in deny_word_set:
-                fragment = sentence[max(sp_pos_select[i][1]-1, 0):sp_pos_select[i][1]] + fragment
+            if fix_deny_fragment:
+                if sentence[max(sp_pos_select[i][1]-3, 0):sp_pos_select[i][1]] in deny_word_set:
+                    fragment = sentence[max(sp_pos_select[i][1]-3, 0):sp_pos_select[i][1]] + fragment
+                elif sentence[max(sp_pos_select[i][1]-2, 0):sp_pos_select[i][1]] in deny_word_set:
+                    fragment = sentence[max(sp_pos_select[i][1]-2, 0):sp_pos_select[i][1]] + fragment
+                elif sentence[max(sp_pos_select[i][1]-1, 0):sp_pos_select[i][1]] in deny_word_set:
+                    fragment = sentence[max(sp_pos_select[i][1]-1, 0):sp_pos_select[i][1]] + fragment
             # 仅保留全中文的短语
             if not is_all_chinese(fragment):
                 continue
@@ -261,8 +266,12 @@ class SentenceKeyword:
         # 取短词
         # if word_select:
         #     return list(word_select)
-        # 原句
-        return [split_punctuation(sentence)[-1]]
+        # 原句的最后一个片段。如果是'。。。'则返回[]
+        pieces = split_punctuation(sentence)
+        if len(pieces) >= 1:
+            return [split_punctuation(sentence)[-1]]
+        else:
+            return []
 
 
 def get_keyword_graph4panda(info, **kwargs):
