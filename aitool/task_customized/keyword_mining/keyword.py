@@ -78,7 +78,7 @@ def get_keyword_graph(
     :param fix_deny_fragment: 是否补齐短语前的否定词
     :param max_len: 短语的最大长度
     :param score_negative: 负向情感加分
-    :param score_positive: 正    向情感加分
+    :param score_positive: 正向情感加分
     :return: 节点表，边表，附加信息
     """
     if default_keyword:
@@ -218,7 +218,13 @@ def get_keyword_graph(
     # 整理出node表
     node = []
     for kp, score in keypair_selected_new:
-        node.append([keypair2best_fragment[kp], keypair2rank_score[kp], keypair2sentence[kp]])
+        node.append([
+            keypair2best_fragment[kp],
+            keypair2rank_score[kp],
+            keypair2sentence[kp],
+            keypair2times[kp],
+            keypair_score_sum[kp],
+        ])
     # 构建虚假的边集和
     relation = []
     len_node = len(node)
