@@ -300,7 +300,8 @@ class SentenceKeyword:
                 continue
             rst.append(fragment)
         if use_label:
-            rst = list(set(rst.extend([_ for _ in label if len(_)>3])))
+            rst.extend([_ for _ in label if len(_) > 3])
+            rst = list(set(rst))
         if rst:
             return rst
         # 挖掘结果为空时兜底策略
