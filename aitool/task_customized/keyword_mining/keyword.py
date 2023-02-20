@@ -64,6 +64,8 @@ def get_keyword_graph(
         deny_word=True,
         fix_deny_fragment=True,
         max_len=10,
+        score_negative=1.0,
+        score_positive=-0.1,
 ) -> Tuple[List, List, Any]:
     """
     输入一组文本。提取关键词和边。
@@ -75,6 +77,8 @@ def get_keyword_graph(
     :param deny_word: 是否向词表中加入所有否定词
     :param fix_deny_fragment: 是否补齐短语前的否定词
     :param max_len: 短语的最大长度
+    :param score_negative: 负向情感加分
+    :param score_positive: 正    向情感加分
     :return: 节点表，边表，附加信息
     """
     if default_keyword:
@@ -178,8 +182,8 @@ def get_keyword_graph(
             keypair2rank_score[kp] += 0.8
         elif keypair2times[kp] > 10:
             keypair2rank_score[kp] += 0.3
-        keypair2rank_score[kp] += keypair2sentiment_negative[kp]
-        keypair2rank_score[kp] += (keypair2sentiment_negative[kp]-keypair2sentiment[kp]) * 0.1
+        keypair2rank_score[kp] += keypair2sentiment_negative[kp] * score_negative
+        keypair2rank_score[kp] += (keypair2sentiment[kp]-keypair2sentiment_negative[kp]) * score_positive
         all_feature.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp],
                             keypair2distance_average[kp], keypair2best_fragment[kp], keypair2sentiment[kp],
                             keypair2sentiment_negative[kp], keypair2rank_score[kp]])
