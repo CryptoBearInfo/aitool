@@ -61,6 +61,7 @@ def get_keyword_graph(
         pos=('ns', 'n', 'vn', 'v'),
         new=1.0,
         default_keyword=False,
+        deduplication=False,
         deny_word=True,
         fix_deny_fragment=True,
         max_len=10,
@@ -72,10 +73,12 @@ def get_keyword_graph(
     """
     输入一组文本。提取关键词和边。
     :param texts: 一组文本
+
     :param top: 保留原始keyword的个数
     :param pos: 保留原始keyword的词性
     :param new: 新颖性得分权重
-    :param default_keyword:
+    :param default_keyword: False时从输入的文本中计算关键词，True时用实现计算好的（此时deduplication无效）。
+    :param deduplication: 对输入的文本去重
     :param deny_word: 是否向词表中加入所有否定词
     :param fix_deny_fragment: 是否补齐短语前的否定词
     :param max_len: 短语的最大长度
@@ -90,6 +93,8 @@ def get_keyword_graph(
         keyword2score = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
     else:
         # 不使用预先计算好的keyword
+        if deduplication:
+            texts = list(set(texts))
         concat_text = '\n'.join(texts)
         print('sentence:', len(texts), 'char', len(concat_text))
         keyword2score = get_keyword(concat_text, top=top, pos=pos)
