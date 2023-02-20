@@ -88,9 +88,17 @@ def get_keyword_graph(
     :param score_positive: 正向情感加分
     :return: 节点表，边表，附加信息
     """
+    tfidf = jieba.analyse.TFIDF()
     if default_keyword:
         # 使用预先计算好的keyword（从1000万个视频标题文本计算得到）
-        keyword2score = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
+        keyword2score_all = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
+        meet_word = set()
+        for sentence in tqdm(texts, 'select default keyword'):
+            meet_word |= set(list(tfidf.tokenizer.cut(sentence)))
+        keyword2score = {}
+        for k, v in keyword2score_all.items():
+            if k in meet_word:
+                keyword2score[k] = v
     else:
         # 不使用预先计算好的keyword
         if deduplication:
@@ -119,7 +127,6 @@ def get_keyword_graph(
     keypair2fragment = defaultdict(list)
     keypair2sentence = defaultdict(list)
     keypair_score_sum = defaultdict(int)
-    tfidf = jieba.analyse.TFIDF()
     for sentence in tqdm(texts, 'connect keypair'):
         sp = list(tfidf.tokenizer.cut(sentence))
         sp_pos = [[sp[i], len(''.join(sp[:i]))] for i in range(len(sp))]
