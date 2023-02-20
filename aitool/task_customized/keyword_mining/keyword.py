@@ -64,6 +64,8 @@ def get_keyword_graph(
         deny_word=True,
         fix_deny_fragment=True,
         max_len=10,
+        new_char=1,
+        min_count=3,
         score_negative=1.0,
         score_positive=-0.1,
 ) -> Tuple[List, List, Any]:
@@ -77,6 +79,8 @@ def get_keyword_graph(
     :param deny_word: 是否向词表中加入所有否定词
     :param fix_deny_fragment: 是否补齐短语前的否定词
     :param max_len: 短语的最大长度
+    :param new_char: 短语必须包含至少new_char个新的字
+    :param min_count: 短语至少重复出现min_count次
     :param score_negative: 负向情感加分
     :param score_positive: 正向情感加分
     :return: 节点表，边表，附加信息
@@ -150,6 +154,7 @@ def get_keyword_graph(
             if len(keypair2sentence[kp]) < 10:
                 keypair2sentence[kp].append(sentence)
             keypair_score_sum[kp] = keyword2score[sp_pos_select[i][0]] + keyword2score[sp_pos_select[i + 1][0]]
+    print('find keypair', len(keypair_score_sum))
     # keypair算特征
     keypair2times = {}
     keypair2distance_average = {}
@@ -187,18 +192,24 @@ def get_keyword_graph(
         all_feature.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp],
                             keypair2distance_average[kp], keypair2best_fragment[kp], keypair2sentiment[kp],
                             keypair2sentiment_negative[kp], keypair2rank_score[kp]])
-    # 筛选出没有显著重复的词
+    # 筛选短语
     all_feature.sort(key=lambda _: _[-1], reverse=True)
     keypair_selected = []
     keypair_selected2rank_score = {}
     char_selected = set()
     for kpl in all_feature:
         kp = kpl[0]
+        # 去除有显著重复的短语
         _char = set(keypair2best_fragment[kp])
-        if len(_char - char_selected) >= 2:
-            keypair_selected.append(kp)
-            keypair_selected2rank_score[kp] = keypair2rank_score[kp]
-            char_selected |= _char
+        if len(_char - char_selected) <= new_char:
+            continue
+        # 去除出现次数过少的短语
+        if keypair2times[kp] < min_count:
+            continue
+        keypair_selected.append(kp)
+        keypair_selected2rank_score[kp] = keypair2rank_score[kp]
+        char_selected |= _char
+    print('select keypair', len(keypair_selected))
     # 对入选的词做新颖性加分
     keypair_selected_new = []
     word_count = defaultdict(int)
