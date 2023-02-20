@@ -63,14 +63,18 @@ def get_keyword_graph(
         default_keyword=False,
         deny_word=True,
         fix_deny_fragment=True,
+        max_len=10,
 ) -> Tuple[List, List, Any]:
     """
     输入一组文本。提取关键词和边。
     :param texts: 一组文本
-    :param top:
-    :param pos:
+    :param top: 保留原始keyword的个数
+    :param pos: 保留原始keyword的词性
     :param new: 新颖性得分权重
     :param default_keyword:
+    :param deny_word: 是否向词表中加入所有否定词
+    :param fix_deny_fragment: 是否补齐短语前的否定词
+    :param max_len: 短语的最大长度
     :return: 节点表，边表，附加信息
     """
     if default_keyword:
@@ -130,6 +134,9 @@ def get_keyword_graph(
                     fragment = sentence[max(sp_pos_select[i][1]-1, 0):sp_pos_select[i][1]] + fragment
             # 仅保留全中文的短语
             if not is_all_chinese(fragment):
+                continue
+            # 去除过长的短语
+            if len(fragment) > max_len:
                 continue
             kp = sp_pos_select[i][0] + sp_pos_select[i + 1][0]
             kp_distance = -sp_pos_select[i][1] - len(sp_pos_select[i][0]) + sp_pos_select[i + 1][1]
