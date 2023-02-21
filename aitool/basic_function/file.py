@@ -409,7 +409,7 @@ dump_csv = functools.partial(dump_panda, file_format='csv')
 dump_excel = functools.partial(dump_panda, file_format='excel')
 
 
-def load_excel(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
+def load_excel(*args, to_list=False, **kwargs) -> Union[ndarray, List]:
     print(args[0])
     if args[0][-4:] == '.xls':
         kwargs['engine'] = 'xlrd' if 'engine' not in kwargs else kwargs['engine']
@@ -424,7 +424,10 @@ def load_excel(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
     except ValueError as err:
         print(err)
     if to_list:
-        return data.tolist()
+        data_list = data.tolist()
+        if not isinstance(data_list, list):
+            data_list = [data_list]
+        return data_list
     return data
 
 
