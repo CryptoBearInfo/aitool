@@ -320,43 +320,53 @@ class SentenceKeyword:
 
 def get_keyword_graph4panda(info, **kwargs):
     # info 的格式为comment_id	group_id	text
+    # todo 计算vv的逻辑可以优化
     info_list = np2list(info)
     texts = []
     text2info = {}
-    for comment_id, group_id, text in info_list:
+    for comment_id, group_id, vv, text in info_list:
         texts.append(text)
-        text2info[text] = (comment_id, group_id)
+        if vv == 'NULL':
+            vv = 0
+        else:
+            vv = int(vv)
+        text2info[text] = (comment_id, group_id, vv)
     rst, node, rel = get_keyword_graph(texts, **kwargs)
     node_detail = []
-    for kp, score, sents in node:
+    for kp, rank_score, sents, times, score_sum in node:
+        svv = 0
         detail = []
+        for _text in text2info.keys():
+            if kp in _text:
+                svv += text2info[_text][2]
         for sent in sents:
             if sent in text2info:
                 detail.append({'text': sent, 'comment_id':text2info[sent][0], 'group_id':text2info[sent][1]})
-        node_detail.append([kp, score, detail])
+        node_detail.append([kp, rank_score, svv, detail])
     return node_detail, rel
 
 
 if __name__ == '__main__':
-    data = [
-        '纨绔的游戏，不知道正义能不能到来',
-        '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
-        '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
-        '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
-        '不是有意违规',
-        '怎么就违规了'
-    ]
+    # data = [
+    #     '纨绔的游戏，不知道正义能不能到来',
+    #     '严打之下，应该没有保护伞。恶魔，早点得到应有的报应。',
+    #     '父母什么责任？？你24小时跟着你14岁的孩子的吗？',
+    #     '我要当父亲别说三个了，他三家人都要去团聚[抠鼻][抠鼻]',
+    #     '不是有意违规',
+    #     '怎么就违规了'
+    # ]
     # xx = SentenceKeyword()
     # for s in data:
     #     print(s)
     #     print(xx.get_sentence_keyword(s))
 
-    all_feature, node, relation = get_keyword_graph(data)
-    print(node)
-    print(relation)
+    # all_feature, node, relation = get_keyword_graph(data)
+    # print(node)
+    # print(relation)
 
     # SentenceKeyword.update_keyword('/Users/bytedance/Downloads/281474998307169-point_extend-拉取大量标题-查询4.csv')
 
     # data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
     # print(get_keyword_graph4panda(data))
     # print(get_keyword_graph4panda(data, default_keyword=True))
+    pass
