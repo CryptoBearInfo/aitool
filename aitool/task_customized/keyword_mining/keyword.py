@@ -364,9 +364,12 @@ if __name__ == '__main__':
     # print(node)
     # print(relation)
 
-    # SentenceKeyword.update_keyword('/Users/bytedance/Downloads/281474998307169-point_extend-拉取大量标题-查询4.csv')
+    # SentenceKeyword.update_keyword('./mini.csv')
 
-    # data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
+    # data = load_excel('./mini.xlsx')
     # print(get_keyword_graph4panda(data))
     # print(get_keyword_graph4panda(data, default_keyword=True))
-    pass
+
+    text = '我只是发表了一下我状态嘛，因为我是修脚师吗？'
+    sk = SentenceKeyword()
+    print(sk.get_sentence_keyword(text, use_label=True))
