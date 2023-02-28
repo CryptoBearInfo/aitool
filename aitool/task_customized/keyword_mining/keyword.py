@@ -78,7 +78,7 @@ def get_keyword_graph(
     :param top: 保留原始keyword的个数
     :param pos: 保留原始keyword的词性
     :param use_short: 保留短词
-    :param short_weight: 短词的权重，权重越高，短词的排序越靠前
+    :param short_weight: 短词的权重，权重越高短词排序越靠前
     :param mix_short: 输出短词
     :param new: 新颖性得分权重
     :param default_keyword: False时从输入的文本中计算关键词，True时用实现计算好的（此时deduplication无效）。
