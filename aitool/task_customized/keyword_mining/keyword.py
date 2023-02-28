@@ -388,6 +388,10 @@ def get_keyword_graph4panda(info, **kwargs):
     texts = []
     text2info = {}
     for comment_id, group_id, vv, text in info_list:
+        if text != text:
+            continue
+        if text == '':
+            continue
         texts.append(text)
         if vv == 'NULL':
             vv = 0
