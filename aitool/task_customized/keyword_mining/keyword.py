@@ -113,7 +113,7 @@ def get_keyword_graph(
         # 不使用预先计算好的keyword
         if deduplication:
             texts = list(set(texts))
-        concat_text = '\n'.join(texts)
+        concat_text = '\n'.join(map(str, texts))
         print('sentence:', len(texts), 'char', len(concat_text))
         keyword2score = get_keyword(concat_text, top=top, pos=pos)
     keyword_set = set(list(keyword2score.keys()))
