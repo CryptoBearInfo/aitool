@@ -252,10 +252,14 @@ def get_keyword_graph(
 
     # 筛选短语
     all_feature.sort(key=lambda _: _[-1], reverse=True)
+    kp2feature_idx = {}
+    for idx, kpl in enumerate(all_feature):
+        kp2feature_idx[kp] = idx
+
     keypair_selected = []
     keypair_selected2rank_score = {}
     char_selected = set()
-    kp2feature_idx = {}
+
     for idx, kpl in enumerate(all_feature):
         kp = kpl[0]
         kp2feature_idx[kp] = idx
@@ -383,6 +387,8 @@ def get_keyword_graph4panda(info, **kwargs):
     for comment_id, group_id, vv, text in info_list:
         texts.append(text)
         if vv == 'NULL':
+            vv = 0
+        elif vv != vv:  # NaN
             vv = 0
         else:
             vv = int(vv)
