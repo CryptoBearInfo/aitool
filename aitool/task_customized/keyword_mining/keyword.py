@@ -92,6 +92,9 @@ def get_keyword_graph(
     tfidf = jieba.analyse.TFIDF()
     stm = Sentiment()
 
+    # 确保texts里都是字符串
+    texts = list(map(str, texts))
+
     # 记录key的相关信息
     keyword2score = {}
     keyword_filtered = set()
@@ -113,7 +116,7 @@ def get_keyword_graph(
         # 不使用预先计算好的keyword
         if deduplication:
             texts = list(set(texts))
-        concat_text = '\n'.join(map(str, texts))
+        concat_text = '\n'.join(texts)
         print('sentence:', len(texts), 'char', len(concat_text))
         keyword2score = get_keyword(concat_text, top=top, pos=pos)
     keyword_set = set(list(keyword2score.keys()))
