@@ -60,6 +60,7 @@ def get_keyword_graph(
         top=10000,
         pos=('ns', 'n', 'vn', 'v'),
         use_short=False,
+        short_weight=1.0,
         new=1.0,
         default_keyword=False,
         deduplication=False,
@@ -76,6 +77,8 @@ def get_keyword_graph(
     :param texts: 一组文本
     :param top: 保留原始keyword的个数
     :param pos: 保留原始keyword的词性
+    :param use_short: 保留短词
+    :param short_weight: 短词的权重，权重越高，短词的排序越靠前
     :param mix_short: 输出短词
     :param new: 新颖性得分权重
     :param default_keyword: False时从输入的文本中计算关键词，True时用实现计算好的（此时deduplication无效）。
@@ -226,6 +229,8 @@ def get_keyword_graph(
         keypair2sentiment[kp] = abs(stm.score(id2keyword[keypair2id[kp][0]])) + \
                                 abs(stm.score(id2keyword[keypair2id[kp][1]]))
     # 对特征汇总并计算排序分
+    # all_feature 里仅在最后加新特征，不要改动前面特征的顺序
+    # TODO 这种数据结构不好
     all_feature = []
     keypair2rank_score = {}
     for kp in keypair2id.keys():
@@ -249,12 +254,13 @@ def get_keyword_graph(
                                      + 0.8 if keyword2count[kw] > 100 else 0.3 if keyword2count[kw] > 10 else 0 \
                                      + keyword2sentiment_negative[kw] * score_negative\
                                      + (keyword2sentiment[kw]-keyword2sentiment_negative[kw]) * score_positive
+            keyword2rank_score[kw] = keyword2rank_score[kw] * short_weight
             all_feature.append([kw, keyword2sentence[kw], keyword2score[kw], keyword2count[kw],
                                0, kw, keyword2sentiment[kw],
                                keyword2sentiment_negative[kw], keyword2rank_score[kw]])
 
     # 筛选短语
-    all_feature.sort(key=lambda _: _[-1], reverse=True)
+    all_feature.sort(key=lambda _: _[8], reverse=True)
     kp2feature_idx = {}
     for idx, kpl in enumerate(all_feature):
         kp2feature_idx[kp] = idx
