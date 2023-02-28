@@ -4,6 +4,12 @@
 - 三种方法都基于multiprocess库，而非multiprocessing库。因为multiprocessing有[设计缺陷](https://bugs.python.org/issue25053)。）
 
 
+**NOTE** 
+1、被调用函数最好只有1个参数，即，将原本的输入参数用一个list或dict包装一下   
+2、是进程级并行，会复制整个进程，最好优化一下进程里内存消耗。
+3、python的线程级并行并没有实际用到多核，所以一下均使用的进程级并行
+
+
 假如函数toy需要被多次调用：
 ```python
 def toy(x, y=1):

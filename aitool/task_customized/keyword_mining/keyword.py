@@ -59,29 +59,76 @@ def get_keyword_graph(
         texts: List[str],
         top=10000,
         pos=('ns', 'n', 'vn', 'v'),
+        use_short=False,
         new=1.0,
         default_keyword=False,
+        deduplication=False,
         deny_word=True,
         fix_deny_fragment=True,
+        max_len=10,
+        new_char=1,
+        min_count=3,
+        score_negative=1.0,
+        score_positive=-0.1,
 ) -> Tuple[List, List, Any]:
     """
     输入一组文本。提取关键词和边。
     :param texts: 一组文本
-    :param top:
-    :param pos:
+    :param top: 保留原始keyword的个数
+    :param pos: 保留原始keyword的词性
+    :param mix_short: 输出短词
     :param new: 新颖性得分权重
-    :param default_keyword:
+    :param default_keyword: False时从输入的文本中计算关键词，True时用实现计算好的（此时deduplication无效）。
+    :param deduplication: 对输入的文本去重
+    :param deny_word: 是否向词表中加入所有否定词
+    :param fix_deny_fragment: 是否补齐短语前的否定词
+    :param max_len: 短语的最大长度
+    :param new_char: 短语必须包含至少new_char个新的字
+    :param min_count: 短语至少重复出现min_count次
+    :param score_negative: 负向情感加分
+    :param score_positive: 正向情感加分
     :return: 节点表，边表，附加信息
     """
+    tfidf = jieba.analyse.TFIDF()
+    stm = Sentiment()
+
+    # 记录key的相关信息
+    keyword2score = {}
+    keyword_filtered = set()
+    keyword2count = defaultdict(int)
+    keyword2sentence = defaultdict(list)
+    keyword2sentiment = {}
+    keyword2sentiment_negative = {}
+
     if default_keyword:
         # 使用预先计算好的keyword（从1000万个视频标题文本计算得到）
-        keyword2score = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
+        keyword2score_all = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
+        meet_word = set()
+        for sentence in tqdm(texts, 'select default keyword'):
+            meet_word |= set(list(tfidf.tokenizer.cut(sentence)))
+        for k, v in keyword2score_all.items():
+            if k in meet_word:
+                keyword2score[k] = v
     else:
         # 不使用预先计算好的keyword
+        if deduplication:
+            texts = list(set(texts))
         concat_text = '\n'.join(texts)
         print('sentence:', len(texts), 'char', len(concat_text))
         keyword2score = get_keyword(concat_text, top=top, pos=pos)
     keyword_set = set(list(keyword2score.keys()))
+
+    # 作为单独输出的短词，要求全中文
+    for kw in keyword_set:
+        if not is_all_chinese(kw):
+            continue
+        keyword_filtered.add(kw)
+        sentiment_score = stm.score(kw)
+        keyword2sentiment[kw] = abs(sentiment_score)
+        keyword2sentiment_negative[kw] = 0
+        if sentiment_score == -1:
+            keyword2sentiment_negative[kw] = 1
+
     # 导入否定词,并给定一个固定的分数
     deny_word_set = set(load_lines(path.join(DATAPATH, 'deny.txt')))
     if deny_word:
@@ -102,9 +149,19 @@ def get_keyword_graph(
     keypair2fragment = defaultdict(list)
     keypair2sentence = defaultdict(list)
     keypair_score_sum = defaultdict(int)
-    tfidf = jieba.analyse.TFIDF()
     for sentence in tqdm(texts, 'connect keypair'):
         sp = list(tfidf.tokenizer.cut(sentence))
+        # 记录关键词的信息
+        kw_record = set()  # 避免重复记录到keyword2sentence
+        for kw in sp:
+            if kw in keyword_filtered:
+                keyword2count[kw] += 1
+                if kw not in kw_record:
+                    kw_record.add(kw)
+                    if len(keyword2sentence[kw]) < 10:
+                        keyword2sentence[kw].append(sentence)
+
+        # 计算关键词的下标位置
         sp_pos = [[sp[i], len(''.join(sp[:i]))] for i in range(len(sp))]
         sp_word = set(sp)
         word_select = sp_word & keyword_set
@@ -131,6 +188,9 @@ def get_keyword_graph(
             # 仅保留全中文的短语
             if not is_all_chinese(fragment):
                 continue
+            # 去除过长的短语
+            if len(fragment) > max_len:
+                continue
             kp = sp_pos_select[i][0] + sp_pos_select[i + 1][0]
             kp_distance = -sp_pos_select[i][1] - len(sp_pos_select[i][0]) + sp_pos_select[i + 1][1]
             keypair2distance[kp].append(kp_distance)
@@ -139,13 +199,14 @@ def get_keyword_graph(
             if len(keypair2sentence[kp]) < 10:
                 keypair2sentence[kp].append(sentence)
             keypair_score_sum[kp] = keyword2score[sp_pos_select[i][0]] + keyword2score[sp_pos_select[i + 1][0]]
+    print('find keypair', len(keypair_score_sum))
     # keypair算特征
     keypair2times = {}
     keypair2distance_average = {}
     keypair2best_fragment = {}
     keypair2sentiment = {}
     keypair2sentiment_negative = {}
-    stm = Sentiment()
+
     for kp, (id1, id2) in tqdm(keypair2id.items(), 'analysis keypair'):
         # 出现次数
         keypair2times[kp] = len(keypair2distance[kp])
@@ -171,23 +232,49 @@ def get_keyword_graph(
             keypair2rank_score[kp] += 0.8
         elif keypair2times[kp] > 10:
             keypair2rank_score[kp] += 0.3
-        keypair2rank_score[kp] += keypair2sentiment_negative[kp]
-        keypair2rank_score[kp] += (keypair2sentiment_negative[kp]-keypair2sentiment[kp]) * 0.1
+        keypair2rank_score[kp] += keypair2sentiment_negative[kp] * score_negative
+        keypair2rank_score[kp] += (keypair2sentiment[kp]-keypair2sentiment_negative[kp]) * score_positive
         all_feature.append([kp, keypair2sentence[kp], keypair_score_sum[kp], keypair2times[kp],
                             keypair2distance_average[kp], keypair2best_fragment[kp], keypair2sentiment[kp],
                             keypair2sentiment_negative[kp], keypair2rank_score[kp]])
-    # 筛选出没有显著重复的词
+
+    # 加入短词
+    if use_short:
+        keyword2rank_score = {}
+        for kw in keyword_filtered:
+            keyword2rank_score[kw] = keyword2score[kw] \
+                                     + 0.8 if keyword2count[kw] > 100 else 0.3 if keyword2count[kw] > 10 else 0 \
+                                     + keyword2sentiment_negative[kw] * score_negative\
+                                     + (keyword2sentiment[kw]-keyword2sentiment_negative[kw]) * score_positive
+            all_feature.append([kw, keyword2sentence[kw], keyword2score[kw], keyword2count[kw],
+                               0, kw, keyword2sentiment[kw],
+                               keyword2sentiment_negative[kw], keyword2rank_score[kw]])
+
+    # 筛选短语
     all_feature.sort(key=lambda _: _[-1], reverse=True)
+    kp2feature_idx = {}
+    for idx, kpl in enumerate(all_feature):
+        kp2feature_idx[kp] = idx
+
     keypair_selected = []
     keypair_selected2rank_score = {}
     char_selected = set()
-    for kpl in all_feature:
+
+    for idx, kpl in enumerate(all_feature):
         kp = kpl[0]
-        _char = set(keypair2best_fragment[kp])
-        if len(_char - char_selected) >= 2:
-            keypair_selected.append(kp)
-            keypair_selected2rank_score[kp] = keypair2rank_score[kp]
-            char_selected |= _char
+        kp2feature_idx[kp] = idx
+        # 去除有显著重复的短语
+        _char = set(kpl[5])
+        if len(_char - char_selected) <= new_char:
+            continue
+        # 去除出现次数过少的短语
+        if kpl[3] < min_count:
+            continue
+        keypair_selected.append(kp)
+        keypair_selected2rank_score[kp] = kpl[8]
+        char_selected |= _char
+    print('select keypair', len(keypair_selected))
+
     # 对入选的词做新颖性加分
     keypair_selected_new = []
     word_count = defaultdict(int)
@@ -204,11 +291,20 @@ def get_keyword_graph(
         new_score *= new
         keypair_selected_new.append([kp, keypair_selected2rank_score[kp] + new_score])
     keypair_selected_new.sort(key=lambda _: _[1], reverse=True)
+
     # 整理出node表
     node = []
     for kp, score in keypair_selected_new:
-        node.append([keypair2best_fragment[kp], keypair2rank_score[kp], keypair2sentence[kp]])
-    # 构建虚假的边集和
+        kp_feature = all_feature[kp2feature_idx[kp]]
+        node.append([
+            kp_feature[5],
+            kp_feature[8],
+            kp_feature[1],
+            kp_feature[3],
+            kp_feature[2],
+        ])
+
+    # 构建边
     relation = []
     len_node = len(node)
     for i in range(len_node):
@@ -242,7 +338,11 @@ class SentenceKeyword:
         label = []
         label_text = sentence.split('#', 1)
         if len(label_text) >= 2:
-            label = label_text[1].split('#')
+            label_ori = label_text[1].split('#')
+            for _l in label_ori:
+                strip_l = _l.strip()
+                if len(strip_l) > 0:
+                    label.append(strip_l)
         # 提取fragment
         sp = list(self.tfidf.tokenizer.cut(sentence))
         sp_pos = [[sp[i], len(''.join(sp[:i]))] for i in range(len(sp))]
@@ -260,7 +360,8 @@ class SentenceKeyword:
                 continue
             rst.append(fragment)
         if use_label:
-            rst = list(set(rst.extend([_ for _ in label if len(_)>3])))
+            rst.extend([_ for _ in label if len(_) > 3])
+            rst = list(set(rst))
         if rst:
             return rst
         # 挖掘结果为空时兜底策略
@@ -279,20 +380,31 @@ class SentenceKeyword:
 
 def get_keyword_graph4panda(info, **kwargs):
     # info 的格式为comment_id	group_id	text
+    # todo 计算vv的逻辑可以优化
     info_list = np2list(info)
     texts = []
     text2info = {}
-    for comment_id, group_id, text in info_list:
+    for comment_id, group_id, vv, text in info_list:
         texts.append(text)
-        text2info[text] = (comment_id, group_id)
+        if vv == 'NULL':
+            vv = 0
+        elif vv != vv:  # NaN
+            vv = 0
+        else:
+            vv = int(vv)
+        text2info[text] = (comment_id, group_id, vv)
     rst, node, rel = get_keyword_graph(texts, **kwargs)
     node_detail = []
-    for kp, score, sents in node:
+    for kp, rank_score, sents, times, score_sum in node:
+        svv = 0
         detail = []
+        for _text in text2info.keys():
+            if kp in _text:
+                svv += text2info[_text][2]
         for sent in sents:
             if sent in text2info:
                 detail.append({'text': sent, 'comment_id':text2info[sent][0], 'group_id':text2info[sent][1]})
-        node_detail.append([kp, score, detail])
+        node_detail.append([kp, rank_score, svv, detail])
     return node_detail, rel
 
 
@@ -305,17 +417,35 @@ if __name__ == '__main__':
         '不是有意违规',
         '怎么就违规了'
     ]
+    _, n, r = get_keyword_graph(
+        data,
+        use_short=True,
+        deny_word=False,
+        max_len=6,
+        top=5000,
+        score_negative=0,
+        deduplication=False,
+        min_count=1,
+        pos=(),
+    )
+    for _ in n:
+        print(_)
+
     # xx = SentenceKeyword()
     # for s in data:
     #     print(s)
     #     print(xx.get_sentence_keyword(s))
 
-    all_feature, node, relation = get_keyword_graph(data)
-    print(node)
-    print(relation)
+    # all_feature, node, relation = get_keyword_graph(data)
+    # print(node)
+    # print(relation)
 
-    # SentenceKeyword.update_keyword('/Users/bytedance/Downloads/281474998307169-point_extend-拉取大量标题-查询4.csv')
+    # SentenceKeyword.update_keyword('./mini.csv')
 
-    # data = load_excel('/Users/bytedance/PycharmProjects/textgraph/南宁杀人_mini.xlsx')
-    # print(get_keyword_graph4panda(data))
+    # data = load_excel('./mini.xlsx')
+
     # print(get_keyword_graph4panda(data, default_keyword=True))
+
+    # text = '我只是发表了一下我状态嘛，因为我是修脚师吗？'
+    # sk = SentenceKeyword()
+    # print(sk.get_sentence_keyword(text, use_label=True))

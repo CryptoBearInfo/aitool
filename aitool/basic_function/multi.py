@@ -317,10 +317,32 @@ def test_pool_map():
         print(result)
 
 
+def test_pool_map_2():
+    print('test_pool_map_2')
+
+    def toy(x, y):
+        sleep(random())
+        return x, y
+
+    for result in pool_map(toy, [[0, 1], [1, 2], [2, 3]]):
+        print(result)
+
+
 def test_pool_starmap():
     print('test_pool_starmap')
 
     def toy(x, y=1):
+        sleep(random())
+        return x, y
+
+    for result in pool_starmap(toy, [[0, 1], [1, 2], [2, 3]]):
+        print(result)
+
+
+def test_pool_starmap_2():
+    print('test_pool_starmap_2')
+
+    def toy(x, y):
         sleep(random())
         return x, y
 
@@ -342,7 +364,9 @@ if __name__ == '__main__':
     # 核心测试样例
     test_sequence()
     test_pool_map()
+    # test_pool_map_2()
     test_pool_starmap()
+    test_pool_starmap_2()
     test_multi_map()
 
     # 其他次要的测试样例

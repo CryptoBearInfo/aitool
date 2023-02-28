@@ -187,7 +187,7 @@ def is_contains_chinese(strs) -> bool:
 
 def is_all_chinese(text: str) -> bool:
     for char in text:
-        if (not is_contains_chinese(char)) and (char not in '·‧：∙:'):
+        if not is_contains_chinese(char):
             return False
     return True
 
