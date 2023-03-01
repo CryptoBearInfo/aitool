@@ -3,3 +3,4 @@
 # @Author  : xiangyuejia@qq.com
 import os
 PATH = os.path.dirname(__file__)
+WEB = None

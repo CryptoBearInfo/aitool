@@ -20,7 +20,8 @@ from tqdm import tqdm
 from collections import defaultdict, Counter
 import jieba.analyse
 from typing import Dict, Union, List, Any, NoReturn, Tuple
-from aitool import DATAPATH, is_all_chinese, get_most_item, load_lines, dump_pickle, load_pickle, exe_time, load_excel, np2list
+from aitool import DATAPATH, is_all_chinese, get_most_item, load_lines, dump_pickle, load_pickle, exe_time, \
+    load_excel, np2list, get_aitool_data_path
 from aitool.basic_function.basic import split_punctuation
 from aitool.nlp.sentiment_analysis.dict_match import Sentiment
 from random import random
@@ -108,7 +109,7 @@ def get_keyword_graph(
 
     if default_keyword:
         # 使用预先计算好的keyword（从1000万个视频标题文本计算得到）
-        keyword2score_all = load_pickle(path.join(DATAPATH, 'keyword.pkl'))
+        keyword2score_all = load_pickle(get_aitool_data_path('keyword.pkl'))
         meet_word = set()
         for sentence in tqdm(texts, 'select default keyword'):
             meet_word |= set(list(tfidf.tokenizer.cut(sentence)))

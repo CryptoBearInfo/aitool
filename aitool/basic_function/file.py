@@ -4,6 +4,7 @@
 import os
 import sys
 import json
+import stat
 import fileinput
 import warnings
 import pickle
@@ -21,6 +22,33 @@ from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable, Tu
 from numpy import ndarray
 from aitool.basic_function.basic import split_dict
 from aitool.basic_function.deduplication import Deduplication
+
+
+def is_writable(path):
+    # Ensure that it exists.
+    if not os.path.exists(path):
+        return False
+
+    # If we're on a posix system, check its permissions.
+    if hasattr(os, "getuid"):
+        statdata = os.stat(path)
+        perm = stat.S_IMODE(statdata.st_mode)
+        # is it world-writable?
+        if perm & 0o002:
+            return True
+        # do we own it?
+        elif statdata.st_uid == os.getuid() and (perm & 0o200):
+            return True
+        # are we in a group that can write to it?
+        elif (statdata.st_gid in [os.getgid()] + os.getgroups()) and (perm & 0o020):
+            return True
+        # otherwise, we can't write to it.
+        else:
+            return False
+
+    # Otherwise, we'll assume it's writable.
+    # [xx] should we do other checks on other platforms?
+    return True
 
 
 def is_file(path: str) -> bool:
@@ -476,17 +504,6 @@ def unzip(src: str, tgt: str = '') -> NoReturn:
             fz.extract(file, tgt)
     else:
         print('This is not a zip file')
-
-
-def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: str = '', tmp_dir: str = '') -> NoReturn:
-    if not packed:
-        download_file(url, directory)
-    else:
-        if not tmp_dir:
-            from aitool.datasets import PATH as DATA_PATH
-            tmp_dir = os.path.join(DATA_PATH, 'tmp')
-        packed_file = download_file(url, tmp_dir)
-        unzip(packed_file, directory)
 
 
 def split_path(file_path: str) -> Tuple[str, str, Any, Any]:

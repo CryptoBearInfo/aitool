@@ -1,5 +1,7 @@
-# DATA
+# in-package data path
 from aitool.datasets import PATH as DATAPATH
+# web data path
+from aitool.datasets import WEB as WEBPATH
 
 # BASIC FUNCTION
 from aitool.basic_function.basic import split_dict
@@ -21,6 +23,7 @@ from aitool.basic_function.path import get_user_root_path as get_user_root_path
 
 from aitool.basic_function.random import random_base64 as random_base64
 
+from aitool.basic_function.file import is_writable as is_writable
 from aitool.basic_function.file import file_exist as file_exist
 from aitool.basic_function.file import is_file_exist as is_file_exist
 from aitool.basic_function.file import is_file as is_file
@@ -29,7 +32,6 @@ from aitool.basic_function.file import make_dir as make_dir
 from aitool.basic_function.file import is_file_hidden as is_file_hidden
 from aitool.basic_function.file import get_file as get_file
 from aitool.basic_function.file import add_python_path as add_python_path
-
 
 from aitool.basic_function.file import dump_json as dump_json
 from aitool.basic_function.file import load_json as load_json
@@ -44,11 +46,16 @@ from aitool.basic_function.file import load_excel as load_excel
 from aitool.basic_function.file import dump_csv as dump_csv
 from aitool.basic_function.file import load_csv as load_csv
 
-from aitool.basic_function.download.download import download_file as download_file
 from aitool.basic_function.file import zip as zip
 from aitool.basic_function.file import unzip as unzip
-from aitool.basic_function.file import prepare_data as prepare_data
 from aitool.basic_function.file import split_path as split_path
+
+
+from aitool.basic_function.download.download import download_file as download_file
+from aitool.basic_function.download.download import get_download_dir as get_download_dir
+from aitool.basic_function.download.download import get_aitool_data_path as get_aitool_data_path
+from aitool.basic_function.download.download import prepare_data as prepare_data
+
 
 from aitool.basic_function.format_data import flatten as flatten
 from aitool.basic_function.format_data import html2text as html2text
