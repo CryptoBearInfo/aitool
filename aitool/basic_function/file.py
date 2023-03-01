@@ -439,25 +439,6 @@ def load_csv(*args, to_list=False, **kwargs) -> Union[ndarray, Any]:
     return data
 
 
-def download_file(url: str, directory: str) -> str:
-    """
-    download a file from url
-    :param url: url
-    :param directory: save file in the directory
-    :return: the path of the file has been downloaded.
-    """
-    chunk_size = 1024
-    make_dir(directory, is_dir=True)
-    _, name = os.path.split(url)
-    resp = requests.get(url, stream=True)
-    content_size = math.ceil(int(resp.headers['Content-Length']) / chunk_size)
-    path = os.path.join(directory, name)
-    with open(path, "wb") as file:
-        for data in tqdm(iterable=resp.iter_content(1024), total=content_size, unit='k', desc=name):
-            file.write(data)
-    return path
-
-
 def zip(src: str, tgt: str = '') -> NoReturn:
     """
     zip a file or a director.

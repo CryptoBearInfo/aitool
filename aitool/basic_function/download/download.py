@@ -18,8 +18,18 @@
 from typing import Dict, Tuple, Union, List, Iterator, Any, NoReturn, Callable
 import sys
 from urllib import request, error
+from aitool import make_dir
+import requests
+import os
+import math
+from enum import Enum
+from tqdm import tqdm
 # TODO 最基础的网络下载能力，后续download/utils里的修改为复用本文件里的方法
-# TODO 有另外一个类似的函数需要合并 from aitool.basic_function.file import download_file
+
+
+class DownloadMethod(Enum):
+    urlretrieve = 1
+    get = 2
 
 
 def _report_process(block_num, block_size, total_size):
@@ -29,15 +39,25 @@ def _report_process(block_num, block_size, total_size):
 
 def download_file(
         url: str,
-        filename: str = None,
-        reporthook: Callable = _report_process,
-        data: Any = None,
-        show: bool = True,
+        filename: str,
+        method: DownloadMethod = DownloadMethod.urlretrieve,
+        reporthook: Callable = _report_process,     # for DownloadMethod.urlretrieve
+        data: Any = None,                           # for DownloadMethod.urlretrieve
+        show: bool = True,                          # for DownloadMethod.urlretrieve
 ) -> None:
     try:
         if show:
             print("Start downloading {} to {}...".format(url, filename))
-        request.urlretrieve(url, filename, reporthook, data)
+        if method == DownloadMethod.urlretrieve:
+            request.urlretrieve(url, filename, reporthook, data)
+        elif method == DownloadMethod.get:
+            chunk_size = 1024
+            make_dir(filename)
+            resp = requests.get(url, stream=True)
+            content_size = math.ceil(int(resp.headers['Content-Length']) / chunk_size)
+            with open(filename, "wb") as file:
+                for data in tqdm(iterable=resp.iter_content(1024), total=content_size, unit='k', desc=filename):
+                    file.write(data)
         if show:
             print("Download {} successfully!".format(url))
     except (error.HTTPError, error.URLError) as e:
@@ -45,4 +65,5 @@ def download_file(
 
 
 if __name__ == '__main__':
-    pass
+    link = 'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'
+    download_file(link, './x.jpg', method=DownloadMethod.get, show=False)
