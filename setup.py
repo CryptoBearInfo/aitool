@@ -23,7 +23,7 @@ except Exception:
 PACKAGE_VERSION_LOCAL = PACKAGE_VERSION + '+' + sha[:7]
 
 setup(
-  name='bytedaitool',
+  name='aitool',
   version=PACKAGE_VERSION,
   author='xiangyuejia',
   author_email='xiangyuejia@qq.com',
