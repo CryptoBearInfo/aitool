@@ -360,6 +360,21 @@ def test_multi_map():
         print(result)
 
 
+def test_addition_1():
+    print('test_addition_1')
+
+    def toy(x, y=1):
+        return x, y
+
+    def bauble(x=1, y=2):
+        return x + y
+
+    toy_functions = list(get_functions(toy, [1, [2, 3], {'x': 4}, {'x': 6, 'y': 7}]))
+    bauble_functions = list(get_functions(bauble, [None, -2, [-3], [6, -1], {'y': 4}]))
+    for result in multi(toy_functions + bauble_functions):
+        print(result)
+
+
 if __name__ == '__main__':
     # 核心测试样例
     test_sequence()
@@ -375,3 +390,6 @@ if __name__ == '__main__':
     test_get_functions_base()
     test_get_functions_common()
     test_multi_common()
+
+    # 附加测试样例
+    test_addition_1()

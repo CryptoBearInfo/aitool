@@ -16,22 +16,3 @@
 
 """
 from typing import Dict, Union, List, Any, NoReturn, Tuple
-from aitool import load_lines, DATAPATH, singleton
-from os import path
-
-
-@singleton
-class Sentiment:
-    def __init__(self):
-        print('init Sentiment')
-        negative_path = path.join(DATAPATH, 'negative.txt')
-        positive_path = path.join(DATAPATH, 'positive.txt')
-        self.negative = set(load_lines(negative_path))
-        self.positive = set(load_lines(positive_path))
-
-    def score(self, word):
-        if word in self.negative:
-            return -1
-        if word in self.positive:
-            return 1
-        return 0

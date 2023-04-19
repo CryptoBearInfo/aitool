@@ -19,8 +19,7 @@ import json
 from collections import Counter
 from typing import Dict, Union, List, Any, NoReturn, Iterable, Tuple, Generator
 import numpy as np
-from bs4 import BeautifulSoup
-from aitool.task_customized.ip_enhance.filter import is_all_chinese
+from aitool import pip_install
 
 
 def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, bytes)) -> Generator:
@@ -47,6 +46,11 @@ def flatten(data: Union[List[Any], Tuple[Any]], ignore_types: tuple = (str, byte
 
 
 def html2text(html: str):
+    try:
+        from bs4 import BeautifulSoup
+    except ModuleNotFoundError:
+        pip_install('bs4 <1.0.0')
+        from bs4 import BeautifulSoup
     content = BeautifulSoup(html, 'lxml').text
     content = content.replace('\xa0', ' ')
     return content
@@ -271,7 +275,7 @@ def np2list(data):
     return data
 
 
-def get_most_item(items: List[str], short=True, all_chinese=False) -> str:
+def get_most_item(items: List[str], short=True) -> str:
     """
     选出出现次数最高的字符串。
     short=True: 出现次数相同时，选长度最短的
@@ -286,8 +290,6 @@ def get_most_item(items: List[str], short=True, all_chinese=False) -> str:
     text = ''
     cnt = 0
     for k, c in Counter(items).items():
-        if all_chinese and not is_all_chinese(k):
-            continue
         if c > cnt:
             text = k
             cnt = c
@@ -299,6 +301,33 @@ def get_most_item(items: List[str], short=True, all_chinese=False) -> str:
                 text = k
                 cnt = c
     return text
+
+
+def dict2ranked_list(
+        the_dict: Dict[Any, Union[int, float]],
+        limit: bool = False,
+        limit_num: int = 5000000,
+        reverse: bool = False,
+):
+    """
+    将字典转为数组，要求value为int或float
+    对结果排序，以便在在内存有限时只读取头部的部分数据
+    :param the_dict:
+    :param limit:
+    :param limit_num:
+    :param reverse:
+    :return:
+    >>> dict2ranked_list({'A':3, 'B':1})
+    [['B', 1], ['A', 3]]
+    """
+    ranked_list = []
+    for k, v in the_dict.items():
+        ranked_list.append([k, v])
+    ranked_list.sort(key=lambda _: _[1], reverse=reverse)
+    if limit:
+        ranked_list = ranked_list[:limit_num]
+    return ranked_list
+
 
 if __name__ == '__main__':
     import doctest

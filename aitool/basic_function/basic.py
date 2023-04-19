@@ -110,4 +110,6 @@ def is_appear(text: str, traits: List[str]) -> bool:
 
 if __name__ == '__main__':
     # ReplaceChar.evaluate()
-    print(split_punctuation('2月8日，《狂飙》黄瑶饰演者#程金铭发长文谈黄瑶对高启强的感情  ：她从未被生父抛弃，高启强害她家破人亡，偶尔的温情让黄瑶恍惚，但做错事要去该去的地方。'))
+    print(split_punctuation('2月8日，《狂飙》黄瑶饰演者#程金铭发长文谈黄瑶对高启强的感情  ：她从未被生父抛弃，高启强害她家破人亡，'
+                            '偶尔的温情让黄瑶恍惚，但做错事要去该去的地方。'))
+    print(split_char('|,','124,fqw,12|fe'))

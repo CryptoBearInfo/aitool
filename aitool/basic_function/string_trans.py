@@ -16,7 +16,7 @@
 
 """
 from typing import Dict, Tuple, Union, List, Iterator, Any, NoReturn
-from aitool.basic_function.deduplication import deduplicate
+from aitool import deduplicate
 
 def find_all_position(substr: str, text: str) -> List[Tuple[int, int]]:
     """
@@ -43,6 +43,24 @@ def get_ngram(text: str, ngram: int = 2):
         yield text[i: i+ngram]
 
 
+def get_ngrams(text: Union[str, List], min_gram: int, max_gram: int):
+    """
+    获取text的多个ngram片段
+    :param text:
+    :param min_gram:
+    :param max_gram:
+    :return:
+    >>> list(get_ngrams('abcd', 1, 3))
+    ['a', 'b', 'c', 'd', 'ab', 'bc', 'cd', 'abc', 'bcd']
+    >>> list(get_ngrams(['a', 'bc', 'd', 'ef'], 1, 3))
+    [['a'], ['bc'], ['d'], ['ef'], ['a', 'bc'], ['bc', 'd'], ['d', 'ef'], ['a', 'bc', 'd'], ['bc', 'd', 'ef']]
+    """
+    rst = []
+    for ngram in range(min_gram, max_gram+1):
+        rst.extend(list(get_ngram(text, ngram)))
+    return rst
+
+
 def token_hit(text: str, tokens: Iterator[str]) -> List[str]:
     """
     获取text中包含的token的列表
@@ -58,6 +76,17 @@ def token_hit(text: str, tokens: Iterator[str]) -> List[str]:
         if token in text:
             hit_token.append(token)
     return hit_token
+
+
+def filter_keyword(text, keywords, min_count=1):
+    keywords = set(keywords)
+    keywords_len = [len(k) for k in keywords]
+    min_ngram = min(keywords_len)
+    max_ngram = max(keywords_len)
+    the_grams = set(get_ngrams(text, min_ngram, max_ngram))
+    if len(keywords & the_grams) >= min_count:
+        return True
+    return False
 
 
 if __name__ == '__main__':

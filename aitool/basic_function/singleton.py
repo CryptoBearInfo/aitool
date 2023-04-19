@@ -32,8 +32,11 @@ if __name__ == '__main__':
     class A:
         def __init__(self, x):
             self.x = x
+            print('init')
 
     a = A(1)
     b = A(2)
     print(a)
     print(b)
+    print(a.x)
+    print(b.x)

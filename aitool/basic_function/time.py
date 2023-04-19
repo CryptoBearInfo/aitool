@@ -119,6 +119,21 @@ def timestamp(style=None):
     return describe
 
 
+def get_lastday_timestamp():
+    # 算24小时前的时间。因为每天早上凌晨5点更新出最新的（昨天）的分区
+    # YYYYMMDD格式
+    _t = time.localtime(time.time() - 86400)
+    mon = str(_t.tm_mon)
+    day = str(_t.tm_mday)
+    if len(mon) == 1:
+        mon = '0' + mon
+    if len(day) == 1:
+        day = '0' + day
+    print(_t.tm_mon)
+    rst = '{}{}{}'.format(_t.tm_year, mon, day)
+    return rst
+
+
 if __name__ == '__main__':
     @timeout(2.2, None)  # 限时 2 秒超时
     def connect(time):  # 要执行的函数

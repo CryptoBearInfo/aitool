@@ -17,7 +17,6 @@ from tqdm import tqdm
 import math
 import functools
 import zipfile
-import xlsxwriter
 from typing import Any, List, Union, NoReturn, Set, Type, Iterator, Callable, Tuple
 from numpy import ndarray
 from aitool.basic_function.basic import split_dict
@@ -299,6 +298,7 @@ def load_line(
         deduplication: bool = False,
         line_processor: Callable = repeat,
         open_method: str = 'open',
+        limit: int = -1,
 ) -> Iterator:
     """
     按行读入文件，会去掉每行末尾的换行符
@@ -308,17 +308,22 @@ def load_line(
     :param line_processor: 一个函数，对separator的结果做处理
     :param deduplication: 若为True，将不输出重复的行
     :param open_method: 指定打开文件的方法
+    :param limit: 仅读前limit行
     :return: 文件每行的内容
     """
     cache = Deduplication()
 
     def inner_line_process(_file_iterator):
+        count = 0
         for line in _file_iterator:
             if deduplication and cache.is_duplication(line):
                 continue
             item = line.rstrip('\n\r')
             if separator:
                 item = item.split(separator, max_split)
+            count += 1
+            if limit != -1 and count > limit:
+                break
             yield line_processor(item)
 
     with Accessor(file, open_method=open_method) as file_iterator:
@@ -341,6 +346,15 @@ def load_big_data(
         deduplication=deduplication,
         open_method='fileinput',
     )
+
+
+def load_byte(
+        file: str,
+        size: int = 10,
+) -> bytes:
+    with open(file, 'rb') as file:
+        for chunk in iter(lambda: file.read(size), b''):
+            yield chunk
 
 
 def load_lines(
@@ -520,4 +534,8 @@ if __name__ == '__main__':
     #     print(text)
     # add_python_path('../', recursive=False, show=True)
     # load_excel('a.xls')
-    print(split_path('./a/b.k.txt'))
+    # print(split_path('./a/b.k.txt'))
+    # for l in load_line('/a.txt', limit=5):
+    #     print(l)
+    for x in load_byte('test_111.txt'):
+        print(x)

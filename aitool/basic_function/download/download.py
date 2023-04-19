@@ -68,7 +68,6 @@ def get_download_dir():
         if homedir == "~/":
             raise ValueError("Could not find a default download directory")
 
-    # append "nltk_data" to the home directory
     return os.path.join(homedir, "aitool_data")
 
 
@@ -109,36 +108,44 @@ def download_file(
         print(e)
     return filename
 
+
 def get_aitool_data_path(
         file_name,
+        sub_path='',
         url_root=WEBPATH,
         packed: bool = False,
         packed_name=None,
         pack_way=None,
 ):
-    # 目前仅支持在aitool_data目录下直接放文件，如果有文件夹无法处理
-    file_dir = get_download_dir()
-    file_path = os.path.join(file_dir, file_name)
-    if is_file_exist(file_path):
-        return file_path
+    # 在根文件路径下的子路径写在sub_path里
+    # 在远端，是cos系统，不支持文件路径，所以远端是直接用文件名而不用子路径
     if not url_root:
         raise ValueError("invalid url_root")
+
+    file_dir = get_download_dir()
+    file_path = os.path.join(file_dir, sub_path, file_name)
+    if is_file_exist(file_path):
+        return file_path
+
     # 不是压缩包
     if not packed:
         url = os.path.join(url_root, file_name)
-        download_file(url, file_path, method=DownloadMethod.get, show=False)
+        download_file(url, file_path, method=DownloadMethod.get, show=True)
     # 是压缩包 (文件名不同，可能有多级路径)
     else:
         url = os.path.join(url_root, packed_name)
         pack_path = os.path.join(file_dir, packed_name)
-        download_file(url, pack_path, method=DownloadMethod.get, show=False)
+        download_file(url, pack_path, method=DownloadMethod.get, show=True)
         # TODO 默认用zip解压，未考虑其他压缩格式
-        if not pack_way:
-            unzip(pack_path, file_dir)
+        if pack_way == 'zip':
+            print('unzip', pack_path)
+            unzip(pack_path, os.path.join(file_dir, sub_path))
+        else:
+            unzip(pack_path, os.path.join(file_dir, sub_path))
     if is_file_exist(file_path):
         return file_path
     else:
-        raise ValueError("not find: {}".format(file_name))
+        raise ValueError("not find: {}".format(file_path))
 
 
 def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: str = '', tmp_dir: str = '') -> NoReturn:
@@ -147,8 +154,8 @@ def prepare_data(url: str, directory: str = '', packed: bool = False, pack_way: 
         download_file(url, directory)
     else:
         if not tmp_dir:
-            from aitool.datasets import PATH as DATA_PATH
-            tmp_dir = os.path.join(DATA_PATH, 'tmp')
+            from aitool import PATH as DATAPATH
+            tmp_dir = os.path.join(DATAPATH, 'tmp')
         packed_file = download_file(url, tmp_dir)
         unzip(packed_file, directory)
 
